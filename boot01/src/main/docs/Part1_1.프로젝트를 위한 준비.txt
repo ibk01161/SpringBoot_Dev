@@ -1,0 +1,125 @@
+#1. 프로젝트를 위한 준비 (boot01)
+
+* Spring Starter Project를 이용한 프로젝트 생성
+- Spring Starter Project로 스프링 부트 기본 프로젝트 생성
+- Type : Maven,Gradle 선택가능 (Gradle 선택시 별도 플러그인 설치 필요)
+- Packaging : War 지정 (War지정시 Tomcat을 내장된 형태로 사용할 수 있기 때문에 별도 WAS 없이 개발과 테스트가 가능)
+- 스프링 부트와 필요한 라이브러리 선택 (Lombok은 getter/setter등을 자동으로 생성해주는 라이브러리)
+- 스프링 부트2버전은 Spring5 버전을 기준으로 프로젝트를 생성하면 WAS를 내장하고 있음 (Tomcat9 포함)
+
+* 생성한 프로젝트 실행
+- 스프링 부트 메뉴를 이용해 생성하는 프로젝트는 XML파일 없이 프로젝트가 생성됨 (XML파일 대신 resource 아래 application.properties 파일을 이용해 필요한 설정을 지정할 수 있음
+- '프로젝트 이름 + Application.java' 형태로 생성된 파일이 갖고 있는 main() 메소드를 실행해서 프로젝트를 실행하게 됨 (Packages를 war로 선택하면 ServletInitializer.java파일이 추가되는데 이 파일은 서블릿을 실행하는 역할 수행)
+- 프로젝트 실행은 'Run'메뉴에서 'Spring Boot App'을 선택해서 실행할 수 있음, 로그를 보면 스프링 부트 로고가 찍히고, 웹 기반 프로젝트 생성시 내장된 톰캣 was가 같이 실행됨, 포트번호는 가장 마지막에 기록됨
+** 서버 포트 변경 : 스프링에서 사용되는 톰캣은 기본적으로 8080 포트를 이용해 실행, 8080포트를 사용할 수 없는 상황이라면 applicaiton.properties파일을 이용해 변경가능, server.port로 변경가능
+
+* 스프링 프레임워크와 스프링 부트
+- 스프링부트는 간편한 개발 방식에 영감을 얻어 만들어진 스프링의 서브 프로젝트
+- 기존 스프링 개발 방식에서 불편했던 설정이나 버전 충돌 등 불편했던 점들을 없애는 대신 빠르고 쉬운 서버 환경과 테스트 환경 등 한 번에 제공해 간펴한 개발환경 마련
+
+* 스프링부트의 장점
+1) 자동화된 라이브러리 관리
+- 기존 Maven이나 Gradle을 이용해 라이브러리를 추가하는 작업을 해왔다면 스프링부트에서는 이 작업을 더욱 간단히 처리 가능
+2) Spring Boot Auto Configure(자동설정)
+- 스프링부트에서 현재 프로젝트에 추가된 라이브러리를 이용해 자동으로 실행에 필요한 환경을 구성할 수 있음
+- 예를 들어 화면 구성할 때 특정 라이브러리를 사용하기로 결정했다면 이에 관련된 설정을 자동으로 구성해 주기 때문에 별다른 설정 없이 개발할 수 있도록 구성됨
+3) 적당한 라이브러리 자동 결정과 XML 없는 환경 구축
+- 스프링부트를 이용하면 현재 버전과 맞는 관련 라이브러리들을 자동으로 결정함, 라이브러리의 버전이 높거나 낮아서 정상적으로 동작이 안되는 상황을 겪을 필요가 없음
+- 이전처럼 XML을 이용해 라이브러리를 매번 설정하는 과정을 줄일 수 있음
+4) 테스트 환경과 내장 톰캣
+- 스프링부트는 기본적으로 Tomcat을 내장하고 있음, 실행 역시 별도 설정 없이 main 메소드를 실행하는 방식으로 서버를 구동하기 때문에 빠르게 결과를 볼 수 있음
+
+* 스프링 부트 내의 빈(Bean) 테스트하기
+- 스프링부트가 정상적으로 동작한다면 간단한 스프링 MVC의 컨트롤러를 빈으로 추가해 정상적으로 동작하는지 확인 (@RestController 어노테이션 이용)
+- 스프링에서는 어노테이션을 이용하더라도 <component-scan>등 별도 설정 작업이 필요했지만, 스프링부트는 자동으로 처리됨(패키지명을 전혀 다르게 지정한다면 스프링의 빈으로 등록이 안됨)
+- 만일 기본 패키지가 아닌 패키지에 작성한 코드를 이용해 스프링을 사용하고자 한다면 @ComponentScan어노테이션을 이용할 수 있음
+- 'org.sample'이라는 패키지 하위에 있는 클래스들을 스프링에 인식시키고 싶다면 @ComponentScan(basePackages={"org.sample","org.zerock"})로 작성
+- @RestController를 이용했기 때문에 결과 화면은 JSP나 HTML 같은 별도 뷰(View)를 활용하지 않고 문자열 데이터를 브라우저로 전송
+** @RestController : Spring MVC Controller에 @ResponseBody가 추가된 것, Json,XML 형태로 객체 데이터를 반환(전송), 문자열, 객체 등을 리턴하는 메소드들을 가지고 있음 (스프링부트 프로젝트에서 스프링부트를 API서버로 활용할 때 사용)
+		  1) 클라이언트는 URI형식으로 웹 서비스에 요청을 보냄
+		  2) Mapping 되는 Handler와 그 타입을 찾는 DispatcherServlet이 요청을 인터셉트한다.
+		  3) RestController는 해당 요청을 처리하고 데이터를 반환한다.
+
+* Lombok 라이브러리
+- Java 코드를 컴파일할 때 자동으로 추가 메소드를 만들어서 컴파일해 주는 라이브러리
+- 설정해둔 어노테이션을 기준으로 '.class'파일을 만들 때 getter/setter 등을 자동으로 추가하도록 만들 수 있음
+
+* Lombok 라이브러리 설치
+1) jar파일 다운로드
+2) cmd 창 열어서 jar 경로로 이동해서 java -jar lombok.jar 로 실행
+3) sts 나 eclipse 설치 경로 지정후 install/update
+4) ini 파일에 설치가 된 걸 확인 가능
+5) 라이브러리를 추가(수정)하거나 maven에 추가해서 update하면 끝
+
+* Lobmok의 어노테이션
+- DTO, VO, Domain Class(Object)를 작성할 때 맴버 변수(필드, 프로퍼티)에 값을 설정하는 생성자 등등을 자동으로 생성해 주는 라이브러리(불필요하게 반복적으로 만드는 코드를 어노테이션으로 줄여줌)
+
+1) @NonNull
+- Null값이 될 수 없다는 것을 명시 (NullPointerException에 대한 대비책이 될 수 있음)
+
+2) @Cleanup
+- 자동으로 close()메소드를 호출하는 역할
+
+3) @Getter, @Setter
+- 코드가 컴파일 될 때 getter, setter 메소드를 자동으로 생성시켜줌
+- AccessLevel이라는 값을 가지고 있어, 이것을 통해 접근제한자를 설정해줄 수 있음 (기본값 PUBLIC)
+
+4) @ToString
+- toString() 메소드를 자동으로 생성시켜줌
+- exclude 라는 값을 가지고 있어 제외할 필드를 지정할 수 있음
+- callSuper는 상위클래스 toString호출 여부 설정 (true, false로 설정 가능)
+
+5) @EqualsAndHashCode
+- equals()와 hashCode()를 자동으로 생성
+
+6) @NoArgsConstructor, @RequriedArgsConstructor, @AllArgsConstructor
+- 파라미터를 받지 않는 생성자를 만들어 주거나, 지정된 속성들에 대해서만 생성자를 만들거나, 모든 속성에 대해 생성자를 만들어냄
+
+7) @Data
+- @ToString, @EqualsAndHashCode, @Getter(모든속성), @Setter(final이 아닌 속성), @RequredArgsConstructor 자동생성
+
+8) @Value
+- 불변(immutable) 클래스를 생성할 때 사용
+
+9) @Log
+- 종류별 로그를 사용할 수 있도록 설정
+- 기본 변수명 : log(Config 파일을 만들어서 명칭 변경 가능)
+- 로그 종류 : @Log, @Slf4j, @CommonLog 등
+
+10) @Builder
+- 빌더 패턴을 사용할 수 있도록 코드 생성
+- new AA(), setA(), setB(), setC()와 같이 체이닝을 할 수 있는 코드를 생성
+
+11) @SneakyThrows
+- 예외 발생 시 Throwable 타입으로 반환
+
+12) @Synchronized
+- 메소드에서 동기화를 설정
+
+13) @Getter(lazy=true)
+- 동기화를 이용해 최초 한 번만 Getter 호출
+
+* Lombok 사용해보기
+- Lombok을 이용하면 getter/setter 등 메소드를 자동으로 생성하기 때문에 약간의 코드만으로 클래스를 작성 할 수 있음, 어노테이션 설정만으로도 컴파일 시 getter/setter, toString() 메소드 자동 생성
+
+* @Data 어노테이션
+- Lombok에서 @Data를 이용하면 getter/setter를 생성하고, equals(), hashCode(), toString(), 파라미터가 없는 기본 생성자까지 자동으로 만들어 줌
+- toString()은 원하는 속성들만 출력되도록 조정을 해야 하는 경우가 종종 있음(JPA를 이용하는 경우), exclude라는 속성을 이용해 원하지 않는 속성을 출력하지 않도록 제어할 수 있음
+- @ToString(exclude= {"val3"})은 val3이라는 속성을 출력하지 않음
+* ORM에서 주의할 점 - p.38
+- ORM은 객체와 객체가 관계를 가지는 조합의 형태로, 테이블 간의 연관관계를 표현, 이런 경우에 부모 객체와 자식 객체의 toString()에서 문제가 생김
+- 바깥쪽(Member)의 인스턴스의 toString을 호출하면 안쪽(Address) 객체의 toString()을 호출하고, 다시 안쪽 객체는 바깥쪽의 toString()을 호출하는 무한 반복 호출이 진행되기 때문에 StackOverflow를 볼 수 있음
+- @toString은 include나 exclude 같은 속성을 이용해 포함되거나 빠져야하는 인스턴스 변수를 설정할 수 있지만 @Data에서는 불가능, @Getter, @Setter쓰는게 안전
+
+* 스프링부트 프로젝트의 실행과 테스트
+- 스프링부트의 경우 톰캣을 내장해서 사용할 수 있으므로, 별도 서버를 세팅하지 않고도 프로젝트를 바로 실행할 수 있음
+- 프로젝트상에서 main()을 가지고 있는 Application.java를 선택해 Run As로 실행, 실행 후 SampleController에 작성한 /hello가 실행되는지 확인
+- src/test/java내에 Boot01ApplicationTest.java파일로 테스트 환경을 미리 갖추고 있음 (@DataJpaTest나 @JsonTest와 같이 다양한 상황에 맞는 테스트 방식을 만들 수 있음)
+
+* Controller 테스트
+- MockMvc객체의 경우 perform()을 이용해 객체를 브라우저에서 서버의 URL을 호출하듯이 테스트를 진행할 수 있음, 결과는 andExpect()를 통해 확인
+- andExpect()는 결과 확인 외에도 Response에 대한 정보를 체크하는 용도로 사용할 수 있음
+** 주의할 점
+- 테스트 클래스에 @WebMvcTest 어노테이션을 추가해 특정 컨트롤러를 지정, @WebMvcTest 어노테이션을 사용하면 @Controller, @Component, @ControllerAdvice등 작성된 코드를 인식할 수 있음
+- 컨트롤러를 테스트하려면 org.springframework.test.web.servlet.MockMvc타입의 객체를 사용해야함, @WebMvcTest와 같이 사용하면 별도 생성 없이 주입(@Autowired)만으로 코드 작성 가능
+- @Test 어노테이션이 선언된 메소드를 실행하거나 클래스를 JUnit으로 실행하면 자동으로 스프링부트가 시작되고 해당 테스트가 진행됨
