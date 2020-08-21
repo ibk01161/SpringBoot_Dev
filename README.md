@@ -11,3 +11,7 @@ Part1.1_complete
 Part1.2_ing
 * JPA 개념
 * Spring Data JPA 실습을 위한 프로젝트 생성
+
+# 200821
+Part1.2_ing
+* MySQL 연동 및 DataSource 설정
