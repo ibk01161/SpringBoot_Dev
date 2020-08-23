@@ -19,3 +19,7 @@ Part1.2_ing
 # 200822
 Part1.2_complete
 * 엔티티 클래스, Repository 인터페이스 설계 및 테스트(Crud기능)
+
+# 200823
+Part1.3_ing
+* 쿼리메소드 실습
