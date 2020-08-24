@@ -23,3 +23,8 @@ Part1.2_complete
 # 200823
 Part1.3_ing
 * 쿼리메소드 실습
+
+# 200824
+Part1.3_ing
+* @Query 어노테이션 개념
+* 단순한 게시물 검색 처리로 @Query 작성
