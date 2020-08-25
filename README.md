@@ -28,3 +28,7 @@ Part1.3_ing
 Part1.3_ing
 * @Query 어노테이션 개념
 * 단순한 게시물 검색 처리로 @Query 작성
+
+# 200824
+Part1.3_ing
+* @Query의 활용 및 테스트

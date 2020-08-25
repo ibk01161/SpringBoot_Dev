@@ -1,5 +1,6 @@
 package org.zerock;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -38,5 +39,25 @@ public class Boot03ApplicationTests2 {
 	@Test
 	public void testByWriter() {
 		repos.findByWriter("user09").forEach(board -> System.out.println(board));
+	}
+	
+	//4. 필요 컬럼만 추출하는 경우 (content 컬럼 제외)
+	@Test
+	public void testByTitle17() {
+		repos.findByTitle2("17").forEach(arr -> System.out.println(Arrays.toString(arr)));
+	}
+	
+	//5. nativeQuery의 사용
+	@Test
+	public void testByTitle3() {
+		repos.fintByTitle3("17").forEach(arr -> System.out.println(Arrays.toString(arr)));
+	}
+	
+	//6. @Query와 Paging 처리/정렬
+	@Test
+	public void testByPaging() {
+		Pageable page = new PageRequest(0, 10);
+		
+		repos.findBypage(page).forEach(board -> System.out.println(board));
 	}
 }

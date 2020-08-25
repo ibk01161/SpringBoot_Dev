@@ -150,3 +150,65 @@ Hibernate: select board0_.bno as bno1_0_, board0_.content as content2_0_, board0
 Board(bno=199, title=제목..199, writer=user09, content=내용..199, regdate=2020-08-23 15:56:44.0, updatedate=2020-08-23 15:56:44.0)
 Board(bno=189, title=제목..189, writer=user09, content=내용..189, regdate=2020-08-23 15:56:44.0, updatedate=2020-08-23 15:56:44.0)
 ...
+
+* @Query의 활용
+- 장점
+1) 리턴 값이 반드시 엔티티 타입이 아니라 필요한 몇 개의 칼럼 값들만 추출 할 수 있음
+- 엔티티 타입의 경우 테이블의 모든 칼럼을 조회하지만, JPQL을 이용하면 필요한 몇 개의 컬럼들만 조회 할 수 있음
+2) nativeQuery 속성을 지정해서 데이터베이스에 사용하는 SQL을 그대로 사용할 수 있음
+- SQL 자체를 그대로 사용하고 싶을 때나 별도 SQL에 대한 튜닝이 이루어진 경우 유용하게 사용할 수 있음
+3) Repository에 지정된 엔티티 타입 뿐 아니라 필요한 엔티티 타입을 다양하게 사용할 수 있음
+- JPQL의 경우 여러 엔티티 타입을 조회할 수 있기 때문에 한 번에 여러 엔티티 타입을 조회하는 경우에 유용 (댓글 처리 예제 참고)
+
+* @Query의 활용_필요 컬럼만 추출하는 경우
+- @Query를 이용하면 'select'로 시작하는 JPQL 구문을 작성하는데, 이떄 필요 컬럼만 추출 할 수 있음
+- 특이점은 리턴 타입이 엔티티 타입이 아니라 Object[]의 리스트 형태로 작성
+- @Query를 이용할 떄 주의점은 @Query에 대한 해석이 프로젝트 로딩 시점에 이루어짐
+=> @Query의 내용은 프로젝트가 시작되면서 검증되기 때문에 만일 @Query의 내용물이 잘못된 경우에는 프로젝트가 정상적으로 실행되지 않음, 가능한 @Query를 하나씩 작성하고 프로젝트를 실행하는 과정을 거치는게 좋음
+[log]
+Hibernate: select board0_.bno as col_0_0_, board0_.title as col_1_0_, board0_.writer as col_2_0_, board0_.regdate as col_3_0_ from tbl_boards board0_ where (board0_.title like ?) and board0_.bno>0 order by board0_.bno DESC
+[179, 제목..179, user09, 2020-08-23 15:56:44.0]
+[178, 제목..178, user08, 2020-08-23 15:56:44.0]
+...
+
+* @Query의 활용_nativeQuery의 사용
+- 말 그대로 데이터베이스에 종속적인 SQL문을 그대로 사용할 수 있기 때문에 복잡한 쿼리를 작성할 떄 유용하게 사용
+- 데이터베이스에 독립적이라는 장점을 어느 정도 포기해야 하므로 남용X
+- @Query에 nativeQuery 속성을 'true'라고 지정하면 메소드 실행 시 @Query의 value값을 그대로 실행하게 됨
+[log]
+Hibernate: select bno, title, writer from tbl_boards where title like CONCAT('%', ?, '%') and bno > 0 order by bno desc
+[179, 제목..179, user09]
+[178, 제목..178, user08]
+
+* @Query와 Paging 처리/정렬
+- @Query를 이용하더라도 페이징 처리를 하는 Pageable 인터페이스 활용 가능
+- 만약 메소드 파라미터에 Pageable 타입을 사용하게 되면, '@Query로 작성한 내용 + 페이징 처리'의 형태가 됨
+- @Query에는 다른 조건으느 없고 단지 페이징 처리에 필요한 'bno > 0' 조건과 'oreder by' 조건만 부여하고 있음
+[log]
+Hibernate: select board0_.bno as bno1_0_, board0_.content as content2_0_, board0_.regdate as regdate3_0_, board0_.title as title4_0_, board0_.updatedate as updateda5_0_, board0_.writer as writer6_0_ from tbl_boards board0_ where board0_.bno>0 order by board0_.bno DESC limit ?
+Board(bno=200, title=제목..200, writer=user00, content=내용..200, regdate=2020-08-23 15:56:44.0, updatedate=2020-08-23 15:56:44.0)
+Board(bno=199, title=제목..199, writer=user09, content=내용..199, regdate=2020-08-23 15:56:44.0, updatedate=2020-08-23 15:56:44.0)
+
+- 이처럼 Spring Data JPA를 이용하면 약간의 처리만으로 SQL이나 JDBC코드 작성 없이 원하는 결과를 얻을 수 있음
+- 이러한 편리함은 관계가 복잡할수록 난이도가 높아짐
+
+* Querydsl을 이용한 동적 SQL의 처리
+- 쿼리를 처리하다 보면 다양한 상황에 맞게 쿼리를 생성하는 경우가 있음 (다양한 검색 조건에 대해 쿼리 실행하는 경우)
+- 쿼리 메소드나 @Query를 이용하는 경우 개발 속도는 좋지만 고정적인 쿼리만을 생산함
+- 동적인 상황에 대한 처리를 위해 @Querydsl 을 이용(Querydsl의 dsl은 'Domain Specific Language'의 약자로 특정 도메인 객체를 조회한다는 의미)
+- Hibernate의 경우 Criteria라는 것을 주로 이용해 왔지만, Spring Data JPA를 이용하는 경우에는 Querydsl이 편리함
+** Querytdsl을 이용하기 위한 순서
+1) pom.xml의 라이브러리와 Maven 설정의 변경 및 실행
+2) Predicate의 개발
+3) Repository를 통한 실행
+
+* Querydsl을 위한 준비
+- Querydsl은 쉽게 말해서 Java를 이용해서 쿼리 조건을 처리할 떄 사용하는 라이브러리
+- 개발자는 SQL을 직접 처리하지 않고, Querydsl을 이용해서 필요한 조건을 처리하는 Java 코드를 생성하고, Repository를 통해 이를 처리
+- Querydsl을 이용하는 경우 엔티티 클래스는 Querydsl에서 사용하는 '쿼리 도메인 클래스(Q도메인 클래스)' 라는 것을 생성해서 처리해야 하는데 이를 위해 pom.xml과 Maven에 추가적인 변경 작업 필요
+
+1) Querydsl의 라이브러리 추가
+- com.querydsl의 라이브러리 사용
+- Querydsl은 JPA를 처리하기 위해 엔티티 클래스를 생성하는 방식을 이용
+- 이를 'Qdomain'이라고 하는데, 동적 쿼리를 생성해 낼 떄, 이를 이용해야 하기 때문에 반드시 이를 실행할 수 있는 방법이 있어야 함
+- pom.xml에는 Qdomain 클래스르르 생성하는 작업을 위한 코드 생성기가 필요, 이를 위해 pom.xml에 <plugin>을 추가
