@@ -207,8 +207,58 @@ Board(bno=199, title=제목..199, writer=user09, content=내용..199, regdate=20
 - 개발자는 SQL을 직접 처리하지 않고, Querydsl을 이용해서 필요한 조건을 처리하는 Java 코드를 생성하고, Repository를 통해 이를 처리
 - Querydsl을 이용하는 경우 엔티티 클래스는 Querydsl에서 사용하는 '쿼리 도메인 클래스(Q도메인 클래스)' 라는 것을 생성해서 처리해야 하는데 이를 위해 pom.xml과 Maven에 추가적인 변경 작업 필요
 
-1) Querydsl의 라이브러리 추가
+* Querydsl의 라이브러리 추가
 - com.querydsl의 라이브러리 사용
 - Querydsl은 JPA를 처리하기 위해 엔티티 클래스를 생성하는 방식을 이용
 - 이를 'Qdomain'이라고 하는데, 동적 쿼리를 생성해 낼 떄, 이를 이용해야 하기 때문에 반드시 이를 실행할 수 있는 방법이 있어야 함
 - pom.xml에는 Qdomain 클래스르르 생성하는 작업을 위한 코드 생성기가 필요, 이를 위해 pom.xml에 <plugin>을 추가
+- 정상적으로 설정이 되었다면 프로젝트 내에 target이라는 폴더가 생성됨
+- 생성된 target폴더 내 'generated-sources'를 보면 'QBoard.java' 파일이 생성 (생성되지 않는다면, Board.java 파일의 코드를 조금 수정한 다음 저장하면 생성됨)
+- 메이븐에 <plugin>으로 추가된 코드 생성기는 Board.java파일이 변경되면 자동으로 Board.java를 생성해 주므로 한 번만 세팅해 주면 이후에는 별도 작업이 필요X
+
+** QueryDsl 설치 시 발생할 수 있는 문제와 해결책
+1) JDK가 아닌 JRE로 설정된 경우
+2) 프로젝트의 JDK 설정 문제
+- ini 파일에 -vm 과 jdk 경로(javaw.exe) 추가
+- java Build Path에서 JDK 경로 설정
+3) Maven 업데이트
+4) Maven으로 빌드
+- Maven을 이용하는 경우 명령어를 이용해야함
+- Run As에서 Maven Build => new => 빌드 이름, 워크스페이스, Goals 설정 후 apply
+=> Console 타이틀은 'Code Gen' 으로 지정되고, 프로젝트가 빌드되는 것을 확인할 수 있음
+
+* Predicate 준비
+- Predicate는 쉽게 말해 '이 조건이 맞다' 고 판단하는 근거를 함수로 제공하는 것
+- 함수형 패러다임을 가진 언어들에서 자주 사용, Java8버전에도 포함되어 있음
+- Repository에서 Predicate를 파라미터로 전달하기 위해 QueryDslPredicateExecutor<T> 인터페이스를 Repository에 추가해야함
+** QueryDslPredicateExecutor<T> 인터페이스의 메소드
+1) long count(Predicate) : 데이터의 전체 개수
+2) boolean exists(Predicate) : 데이터의 존재 여부
+3) Iterable<T> findAll(Predicate) : 조건에 맞는 데이터
+4) Page<T> findAll(Predicate) : 조건에 맞는 데이터
+5) Iterable<T> findAll(Predicate, Sort) : 조건에 맞는 데이터와 정렬
+6) T findOne(Predicate) : 조건에 맞는 하나의 데이터
+
+* Repository 변경
+- Repository 인터페이스에는 QueryDslPredicateExecutor<T> 인터페이스를 상속하도록 추가
+
+* Predicate 생성 및 테스트
+- Predicate는 '단언,확신하다' 는 의미, 즉 boolean으로 리턴되는 결과 데이터를 만들어야 함, 주로 BooleanBuilder를 이용해서 생성
+- BooleanBuilder를 생성하고, 여기에 동적 쿼리에 필요한 조건을 and()등을 이용해 추가
+- QBoard는 Board의 속성을 이용해 다양한 SQL에 필요한 구문을 처리할 수 있는 기능이 추가된 형태이므로, like()나 get() 등 이용해 원하는 SQL을 구성하는 데 도움을 줌
+- 리턴 타입은 Page<T>로 설정했기 떄문에 데이터를 추출하는 SQL과 개수를 파악하는 SQL이 실행되고 필요한 조건들이 지정됨
+- 이와 같이 Predicate는 필요한 곳에서 생성하는 방식을 이용하기도 하지만 별도 클래스 등으로 만들어 사용할 수 있음
+
+[log]
+Hibernate: select board0_.bno as bno1_0_, board0_.content as content2_0_, board0_.regdate as regdate3_0_, board0_.title as title4_0_, board0_.updatedate as updateda5_0_, board0_.writer as writer6_0_ from tbl_boards board0_ where (board0_.title like ? escape '!') and board0_.bno>? limit ?
+Hibernate: select count(board0_.bno) as col_0_0_ from tbl_boards board0_ where (board0_.title like ? escape '!') and board0_.bno>?
+PAGE SIZE : 10
+TOTAL PAGES : 2
+TOTAL COUNT : 12
+NEXT : Page request [number: 1, size 10, sort: UNSORTED]
+Board(bno=17, title=제목..17, writer=user07, content=내용..17, regdate=2020-08-23 15:56:43.0, updatedate=2020-08-23 15:56:43.0)
+Board(bno=117, title=제목..117, writer=user07, content=내용..117, regdate=2020-08-23 15:56:44.0, updatedate=2020-08-23 15:56:44.0)
+Board(bno=170, title=제목..170, writer=user00, content=내용..170, regdate=2020-08-23 15:56:44.0, updatedate=2020-08-23 15:56:44.0)
+...
+
+
