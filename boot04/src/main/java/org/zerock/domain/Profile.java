@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.EqualsAndHashCode;
@@ -13,7 +14,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "member")
 @Entity
 @Table(name="tbl_profile")
 @EqualsAndHashCode(of = "fno")
@@ -24,5 +25,9 @@ public class Profile {
 	private Long fno;
 	private String fname;
 	private boolean currnet;
+	
+	// 단방향 (다대일)
+	@ManyToOne
+	private Member member;
 
 }

@@ -100,7 +100,45 @@
 1) '회원'에서 '프로필'로의 접근만 사용? - Member클래스에만 Profile타입의 인스턴스 변수 추가?
 2) '프로필'을 통해 '회원' 정보를 조회할 필요? - Profile클래스에도 Member타입의 인스턴스 변수 추가?
 => 이러한 설정을 '단방향 / 양방향' 관계로 구분해줌
+- '단방향'이란 일방 통행의 참조, 예를 들어 회원 정보를 통해서만 프로필 정보를 볼 수 있는 구조
+- '양방향'은 프로필을 먼저 알아내고, 이를 통해 회원 정보를 알아내는 경우
+- 회원과 프로필 관계를 보면 프로필 테이블에 회원 정보가 입력되어야 하므로, 가장 쉬운 구조는 'Profile' 클래스에 'Member' 클래스 타입을 인스턴스 변수로 설계
+- Profile 클래스는 Member 타입의 member라는 인스턴스 변수를 추가 (회원 <=  프로필)
+- Lombok의 @ToString에 exclude 속성을 이용해 Member에 관련된 toString()을 호출하지 않게 설정 
+  (양방향으로 참조 설정했을 때 문제가 생길 수 있음, 양방향으로 참조하는 경우 Member의 toString()을 호출할 떄 Profile의 toString()을 호출하고, Proflie에서는 다시 Member의 toString()을 호출하기 때문에 무한히 반복될 수 있음)
 
+* JPA의 연관관계 어노테이션 처리
+-JPA에서의 연관관계를 크게 @OneToOne, @OneToMany, @ManyToOne, @ManyToMany의 어노테이션을 이용해서 처리 => 테이블 예상 구조를 생각하면서 결정
+- Member와 Profile의 관계는 '일대다' 이지만, Profile과 Member의 관계는 '다대일'이므로 Profile 쪽에서 @ManyToOne 어노테이션 추가
+
+* 생성된 테이블 구조 확인
+- JPA의 연관관계 설정은 JPA를 이용할 떄 가장 중요하므로, 가능하면 연관관계를 맺은 후 프로젝트를 실행해서 올바른 구조로 생성되는지 확인해 주는 것이 좋음
+- Aplication.java를 실행하면 다음과 같이 테이블의 구조와 제약 조건이 생성되는 것을 확인할 수 있음
+Hibernate: create table tbl_members (uid varchar(255) not null, uname varchar(255), upw varchar(255), primary key (uid)) engine=InnoDB
+Hibernate: create table tbl_profile (fno bigint not null auto_increment, currnet bit not null, fname varchar(255), member_uid varchar(255), primary key (fno)) engine=InnoDB
+Hibernate: alter table tbl_profile add constraint FKhvsb89t46nv1one9hbodhrswo foreign key (member_uid) references tbl_members (uid)
+=> 생성된 SQL을 보면 tbl_profile 테이블에 member_uid 라는 컬럼이 추가 되었고, alter table을 통해 FK가 생성되고, tbl_members의 uid 컬럼을 참조함
+
+1_4. Repository 작성
+- 연관관계의 설정에서 'Repository를 몇 개나 생성해야 하는지?' 잘 생각해야함
+- 엔티티 클래스마다 Repository를 설계해 줄 수 있지만, 연관관계의 설정에 따라서 Repository를 설계할 필요가 없을 수도 있음
+- Member와 Profile은 Member를 처리하는 Repository를 생성해서 회원 데이터를 처리하는 것이 명확
+- 반면에 Profile을 저장할 때는 Member 객체를 통해 Profile을 처리할 수 없기 때문에 Profile을 처리하는 Repository를 설계하는것이 보편적
+
+1_5. 테스트를 통한 검증
+- 데이터베이스의 테이블 구조를 설계할 때 많은 수정 과정을 거치듯이 JPA를 이용해서 연관관계를 설정할 때도 이러한 과정이 필요
+- 테스트 폴더에 Test.java 작성 (MemberRepository, ProfileRepository 주입)
+- @Log는 Lombok의 로그를 사용할 때 이용하는 어노테이션, @Commit은 테스트 결과를 데이터베이스에 commit 하는 용도로 사용
+
+* 더미 회원 데이터 추가
+- 우선 프로필 데이터를 추가하기 전에 회원 데이터가 존재해야 하므로, testInsertMembers() 메소드를 작성해 데이터 추가
+- testInsertMembers()는 100명의 회원 데이터를 생성, IntStream.range(1,101)을 이용하면 1부터 100까지 숫자를 생성, Java8버전에서는 forEach()와 연결해 for 루프와 같이 사용
+
+* 특정 회원의 프로필 데이터 처리
+- Profile 데이터는 반드시 Member 객체에 대한 참조가 필요
+- 이 작업을 하는 방식은 MemberRepository를 이용해 실제 Member 객체를 가져와서 처리할 수 있지만, Member를 읽고 난 후 Profile을 읽어야 하기 때문에 좋은 방법X
+- Member의 식별자인 uid 속성을 가져오기 위해 Member 객체만 잠시 생성하는 방식이 더 효율적
+- 테스트 코드를 보면 Member 인스턴스를 추가하는 것을 제외하곤 기존 단일 엔티티 클래스를 활용하는 방식과 동일
 
 
 
