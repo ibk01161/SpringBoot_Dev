@@ -1,5 +1,7 @@
 package org.zerock;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import org.junit.Test;
@@ -55,6 +57,23 @@ public class ProfileTests {
 			
 			profileRepos.save(profile);
 		}
+	}
+	
+	// uid가 'user1'인 회원의 정보와 회원의 프로필 사진 숫자 (@Query)
+	@Test
+	public void testFetchJoin1() {
+		List<Object[]> result = memberRepos.getMemberWithProfileCount("user1");
+		
+		result.forEach(arr -> System.out.println(Arrays.toString(arr)));
+		
+	}
+	
+	// 회원 정보와 현재 사용 중인 프로필에 대한 정보
+	@Test
+	public void testFetchJoin2() {
+		List<Object[]> result = memberRepos.getMemberWithProfile("user1");
+		
+		result.forEach(arr -> System.out.println(Arrays.toString(arr)));
 	}
 
 }
