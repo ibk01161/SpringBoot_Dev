@@ -46,3 +46,7 @@ Part2.4_ing
 Part2.4_ing
 * 연관관계 예제1_테이블 생성
 * 연관관계 예제1_Repository 생성 및 테스트
+
+# 200830
+Part2.4_ing
+* 연관관계 예제1_JPA에서 Join 처리 실습 및 테스트
