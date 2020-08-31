@@ -15,4 +15,7 @@ public interface MemberRepository extends CrudRepository<Member, String> {
 	// 회원 정보와 현재 사용 중인 프로필에 대한 정보
 	@Query("SELECT m, p FROM Member m LEFT OUTER JOIN Profile p ON m.uid = p.member WHERE m.uid = ?1 AND p.currnet = true")
 	public List<Object[]> getMemberWithProfile(String uid);
+	
+	@Query("SELECT m, p FROM Member m JOIN Profile p ON m.uid = p.member WHERE m.uid = ?1")
+	public List<Object[]> getJoin(String uid);
 }

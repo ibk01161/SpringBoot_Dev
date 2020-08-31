@@ -75,5 +75,12 @@ public class ProfileTests {
 		
 		result.forEach(arr -> System.out.println(Arrays.toString(arr)));
 	}
+	
+	@Test
+	public void testJoin() {
+		List<Object[]> result = memberRepos.getJoin("user1");
+		
+		result.forEach(arr -> System.out.println(Arrays.toString(arr)));
+	}
 
 }
