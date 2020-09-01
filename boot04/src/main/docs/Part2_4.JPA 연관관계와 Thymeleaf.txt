@@ -209,7 +209,28 @@ Hibernate: alter table tbl_pdsfiles add constraint FK5cp1n7jygc9jg47y4cbmfwf8j f
 - 반면에 PDSBoard는 모든 PDSFile 객체들의 참조를 보관할 수 있으므로, 우너하는 모든 데이터에 대한 처리가 가능
 - 이처럼 불평등한 관계를 처리하기 위해 각각 Repository를 생성하는 대신 'One'에 해당하는 엔티티 객체에 대한 Repository만 이용하는 것이 좋음
 
-
+2_2. 등록과 Cascading 처리
+- 먼저 새로운 자료가 등록될 때 자료와 첨부된 파일을 동시에 등록하는 경우를 테스트 (테스트java 작성)
+- testInsertPDS()는 1개의 자료와 2개의 첨부파일을 저장하려고 시도, PDSBoardRepository이므로 실제 save()작업은 한 번만 호출, 하지만 에러가 뜸
+- 이유는 JPA에서 한 번에 여러 엔티티 객체들의 상태를 변경해 주어야 하기 때문, 쉽게 말해 한 번에 PDSBoard 객체로 보관해야 하고, PDSFile의 상태도 보관해야만 하기 때문
+- JPA에서는 처리하려는 엔티티 객체의 상태에 따라 종속적인 객체들의 영속성도 같이 처리되는 것을 '영속성 전이'라고 함
+- '영속성 전이' 는 개념이 겉으로 보기엔 데이터베이스의 트랜잭션과 유사한 것 같지만, JPA에서는 메모리상의 객체가 엔티티 매니저의 컨텍스트에 들어가 '영속, 준영속, 비영속'등의 개념이 존재하기 때문에 더 복잡한 상태가 됨
+- '영속성 전이' 는 부모 엔티티나 자식 엔티티의 상태 변화가 자신과 관련 있는 엔티티에 영향을 주는 것을 의미 (ex : 날짜, 일정)
+* 종속적인 엔티티의 영속성 전이에 대한 설정
+1) ALL : 모든 변경에 대해 전이
+2) PERSIST : 저장 시에만 전이
+3) MERGE : 병합 시에만 전이
+4) REMOVE : 삭제 시에만 전이
+5) REFRESH : 엔티티 매니저의 refresh() 호출 시 전이
+6) DETACH : 부모 엔티티가 detach되면 자식 엔티티 역시 detach
+- 영속성 전이에 대한 설정 중 ALL은 모든 엔티티의 상태 변화에 같이 처리되는 옵션이므로, 손쉽게 사용, PDSBoard에서 @OneToMAny속성에 cascade 속성 지정
+- cascade 속성 지정 후 테스트 해보면 성공
+[log]
+Hibernate: insert into tbl_pds (pname, pwriter) values (?, ?)
+Hibernate: insert into tbl_pdsfiles (pdsfile) values (?)
+Hibernate: insert into tbl_pdsfiles (pdsfile) values (?)
+Hibernate: update tbl_pdsfiles set pdsno=? where fno=?
+Hibernate: update tbl_pdsfiles set pdsno=? where fno=?
 
 
 

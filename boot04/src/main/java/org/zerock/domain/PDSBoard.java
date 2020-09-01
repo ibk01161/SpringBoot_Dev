@@ -2,6 +2,7 @@ package org.zerock.domain;
 
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -30,7 +31,7 @@ public class PDSBoard {
 	private String pwriter;
 
 	// 단방향 (일대다)
-	@OneToMany
+	@OneToMany(cascade=CascadeType.ALL)
 	// 이미 존재하는 테이블에 "pdsno" 칼럼 추가
 	@JoinColumn(name="pdsno")
 	private List<PDSFile> files;

@@ -55,3 +55,7 @@ Part2.4_ing
 Part2.4_ing
 * 연관관계 예제2_엔티티 클래스 설계, 테이블 생성
 * 연관관계 예제2_Repository 생성
+
+# 200901
+Part2.4_ing
+* 연관관계 예제2_등록과 Cascading 처리
