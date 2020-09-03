@@ -232,6 +232,43 @@ Hibernate: insert into tbl_pdsfiles (pdsfile) values (?)
 Hibernate: update tbl_pdsfiles set pdsno=? where fno=?
 Hibernate: update tbl_pdsfiles set pdsno=? where fno=?
 
+2_3. 첨부파일 수정과 @Modifying, @Transactional
+- 데이터베이스 처리를 위해 Repository의 존재가 필수적인데, 앞서 살펴본 예제와 같이 PDSBoardRepository만이 존재하여 첨부 파일의 이름만 수정해야 하는 상황에서 PDSFile에 대한 Repos가 존재X
+- 이러한 경우에는 @Query를 이용해서 처리하면 편리
+- @Query는 기본적으로 'select' 구문만 지원하지만 @Modifying을 이용해서 DML(insert, update, delete) 작업을 처리할 수 있음 (UPDATE FROM에서 FROM은 생략 가능)
+- test()는 @Query를 이용해 'update..문'을 실행하는데, delete나 update를 사용하는 경우에는 반드시 @Transactional 처리를 필요로함
+[log]
+2020-09-03 22:02:39.503  INFO 21388 --- [           main] o.s.t.c.transaction.TransactionContext   : Began transaction (1) for test context ....
+Hibernate: update tbl_pdsfiles set pdsfile=? where fno=?
+2020-09-03 22:02:40.397  INFO 21388 --- [           main] org.zerock.PDSBoardTests                 : update count : 1
+2020-09-03 22:02:40.415  INFO 21388 --- [           main] o.s.t.c.transaction.TransactionContext   : Rolled back transaction for test:....
+- 로그 마지막 부분을 보면 Rolled back transaction.... 이라고 출력되고 있는데 데이터베이스의 테이블을 보면 정상적으로 업데이트가 되지 않은 것을 확인할 수 있음
+- 정상적 처리가 되었음에도 불구하고 데이터베이스의 최종 결과가 변경되지 않는 것은 @Transactional이 기본적으로 롤백 처리를 시도하기 때문
+- 이러한 롤백 처리가 싫다면 test.java 선언부에 @Commit을 추가해 자동으로 commit 처리가 되도록 지정할 수 있음
+[log]
+Hibernate: update tbl_pdsfiles set pdsfile=? where fno=?
+2020-09-03 22:30:41.440  INFO 10548 --- [           main] org.zerock.PDSBoardTests                 : update count : 1
+2020-09-03 22:30:41.454  INFO 10548 --- [           main] o.s.t.c.transaction.TransactionContext   : Committed transaction for test...
+* 순수한 객체를 통한 파일 수정
+- @Query와 @Modifying을 이용하는 것이 편리하지만 필요한 경우에는 전통적인 접근 방식을 이용해 수정할 수도 있음
+- 전통적 방식은 PDSBoardRepository에서 PDSBoard를 얻어온 후 내용물인 PDSFile을 수정하고 save()를 이용해 업데이트를 진행하는 것
+- 테스트 코드의 내용은 PDSBoardRepository에서 pid가 2인 PDSBoard 객체를 얻는 것으로 시작
+- findById()의 리턴 타입이 Optional<E>타입이기 때문에 IfPresent()를 이용해서 데이터가 존재한다면 어떠한 처리를 할 것인지 람다식으로 작성
+- 추출한 PDSBoard에서 fno 값이 4번인 PDSFile 객체를 찾아내고, 첨부파일의 목록에서 삭제한 후 새로운 데이터를 추가, PDSFile 클래스는 fno 값으로 equals()와 hashcode()를 사용
+- setFile()을 이용해서 새롭게 갱신된 첨부 파일의 목록을 설정하고, svae() 작업을 진행
+[log]
+Hibernate: select pdsboard0_.pid as pid1_1_0_, pdsboard0_.pname as pname2_1_0_, pdsboard0_.pwriter as pwriter3_1_0_ from tbl_pds pdsboard0_ where pdsboard0_.pid=?
+2020-09-03 23:11:50.741  INFO 16964 --- [           main] org.zerock.PDSBoardTests                 : 데이터가 존재하므로 update 시도
+Hibernate: select files0_.pdsno as pdsno3_2_0_, files0_.fno as fno1_2_0_, files0_.fno as fno1_2_1_, files0_.pdsfile as pdsfile2_2_1_ from tbl_pdsfiles files0_ where files0_.pdsno=?
+Hibernate: update tbl_pdsfiles set pdsfile=? where fno=?
+2020-09-03 23:11:50.903  INFO 16964 --- [           main] o.s.t.c.transaction.TransactionContext   : Committed transaction for test
+- 실행된 SQL을 보면 tbl_pds 테이블에서 데이터를 조회하는 부분과 tbl_profiles 테이블에서 조회하는 부분이 별개로 실행됨 (JPA에서 연관관계의 테이블을 조회할 때 지연로딩(lazy loading) 때문)
+
+2_4. 첨부 파일 삭제
+- 수정과 마찬가지로 '자료'의 첨부 파일을 삭제하는 작업 역시 @Query 이용 또는 객체 접근 방식 사용가능, @Query를 이용하는 것이 훨씬 간단함
+[log]
+Hibernate: delete from tbl_pdsfiles where fno=?
+2020-09-03 23:20:40.037  INFO 11036 --- [           main] org.zerock.PDSBoardTests                 : DELETE PDSFILE : 1
 
 
 
