@@ -270,8 +270,43 @@ Hibernate: update tbl_pdsfiles set pdsfile=? where fno=?
 Hibernate: delete from tbl_pdsfiles where fno=?
 2020-09-03 23:20:40.037  INFO 11036 --- [           main] org.zerock.PDSBoardTests                 : DELETE PDSFILE : 1
 
+2_5. 조인 처리
+- 실제 화면에서는 '특정 자료의 번호와 자료의 제목, 첨부파일의 수'를 같이 보여주어야 하는 상황이 있음 => @Query를 이용해 조인을 처리하여 해결
+- insertDummies()는 100개의 자료와 200개의 파일 데이터를 추가, 기존 데이터 추가와 다른 점은 데이터를 save()하지 않고, List<PDSBoard>에 데이터들을 보관했다가, 한 번에 저장 하는 방식
+- saveAll()을 이용해 한 번에 데이터를 처리하ㅣ게 되면 한 번에 여러 개의 데이터를 insert할 수 있음
+[log]
+Hibernate: insert into tbl_pds (pname, pwriter) values (?, ?)
+Hibernate: insert into tbl_pdsfiles (pdsfile) values (?)
+Hibernate: insert into tbl_pdsfiles (pdsfile) values (?)
+...
+- 앞서 단방향의 경우와 조금 다른점이라면 PDSBoard 객체의 files를 이용해 Outer Join을 처리하고 있다는 점 (조인)
+- JPA를 이용해 객체를 설계할 때 단방향으로 설정하는 가장 큰 기준에 대해 여러 의견들이 존재 (데이터의 가공에 대한 고민이 우선)
+- 앞의 예제들과 같이 단방향의 경우 한쪽의 객체만을 이용한다는 점은 편리하지만 조인이 필요한 경우에는 좀 더 신중히 고민
 
+3. 게시물과 댓글의 관계 - 양방향
+- 양방향 참조는 말 그대로 관계 있는 객체들의 참조를 양쪽에서 가지고 있는 것, 단방향에 비해 설정은 수월하지만 데이터 관리 측면에서는 조금 더 신경 써야 하는 점이 존재
+- 게시물과 댓글의 관계는 전형적인 '일대다', '다대일', 앞의 예제들과 데이터베스상 관계는 동일하지만 JPA를 이용하는 경우에는 동일X, 양방향으로 처리하는 형태로 예제 작성
 
+3_1. 연관관계의 설정
+- 게시물과 댓글의 관계는 '일대다', '다대일'로 지정하고, 양방향으로 지정할 것이므로 FreeBoard 클래스와 FreeBoardReply 클래스에 상호 참조가 가능하도록 설정해야함
+- FreeBoard 클래스는 ERD상의 선분으로 '일대다' 관계이므로 @OnetoMany를 이용해 지정
+- FreeBoardReply는 '다대일'의 관계이므로 @ManyToOne을 지정
+- 프로젝트를 실행 시키면 예상과 달리 3개의 테이블이 생성됨
+[log]
+Hibernate: create table tbl_free_replies (rno bigint not null auto_increment, reply varchar(255), replydate datetime, replyer varchar(255), updatedate datetime, board_bno bigint, primary key (rno)) engine=InnoDB
+Hibernate: create table tbl_freeboards (bno bigint not null auto_increment, content varchar(255), regdate datetime, title varchar(255), updatedate datetime, writer varchar(255), primary key (bno)) engine=InnoDB
+Hibernate: create table tbl_freeboards_replies (free_board_bno bigint not null, replies_rno bigint not null) engine=InnoDB
+- 중간에 지정하지 않은 테이블 하나가 생성되는 이유는 @OneToMany에 있음, @OneToMany관계를 지정하려면 중간에 '다(Many)' 에 해당하는 정보를 보관하기 위해 JPA의 구현체는 별도 테이블을 생성하게됨
+
+* mappedBy 속성
+- 데이터베이스상에서 관계를 맺는 방법이 PK, FK만을 사용해 지정되지만, JPA에서 양쪽이 모두 참조를 사용하는 경우 어떤 쪽이 PK가 되고, 어떤 쪽이 FK가 되는지를 명시해 줄 필요가 있음
+- JPA에서는 관계를 설정할 때 PK 쪽이 mappedBy라는 속성을 이용해 자신이 다른 객체에게 '매여있다' 는 것을 명시하게 됨, 조금 더 어려운 표현으로 '해당 엔티티가 관계의 주체가 되지 않는다는 것을 명시한다'고 함
+- '매여있다'는 표현은 댓글이 있는 상태에서 게시글 삭제가 불가능하기 때문에 '게시글이 댓글에 매여있다'고 볼 수 있음 (FreeBoard..java에 @OneToMany에서 mappedBy 속성 추가)
+- mappedBy는 '~에 매이게 된다'이므로 종속적인 클래스의 인스턴스 변수를 지정, 현재 Reply클래스에는 board라는 변수가 FreeBoard 인스턴스를 의미하므로, 이를 지정
+[log]
+Hibernate: create table tbl_free_replies (rno bigint not null auto_increment, reply varchar(255), replydate datetime, replyer varchar(255), updatedate datetime, board_bno bigint, primary key (rno)) engine=InnoDB
+Hibernate: create table tbl_freeboards (bno bigint not null auto_increment, content varchar(255), regdate datetime, title varchar(255), updatedate datetime, writer varchar(255), primary key (bno)) engine=InnoDB
+- tbl_free_replies 테이블을 보면 board_bno라는 이름의 칼럼이 추가된 것을 볼 수 있음
 
 
 

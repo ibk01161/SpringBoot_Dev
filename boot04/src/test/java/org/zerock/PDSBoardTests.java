@@ -1,8 +1,10 @@
 package org.zerock;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import javax.transaction.Transactional;
 
@@ -95,5 +97,37 @@ public class PDSBoardTests {
 		
 		int count = repos.deletePDSFile(fno);
 		log.info("DELETE PDSFILE : " + count);
+	}
+	
+	// tbl_pds, tbl_pdsfiles 테스트 데이터 추가
+	@Test
+	public void insertDummies() {
+		List<PDSBoard> list = new ArrayList<>();
+		
+		IntStream.range(1, 100).forEach(i -> {
+			
+			PDSBoard pds = new PDSBoard();
+			pds.setPname("자료 " + i);
+			
+			PDSFile file1 = new PDSFile();
+			file1.setPdsfile("file1.doc");
+			
+			PDSFile file2 = new PDSFile();
+			file2.setPdsfile("file2.doc");
+			
+			pds.setFiles(Arrays.asList(file1, file2));
+			
+			log.info("try to save pds");
+			
+			list.add(pds);
+		});
+		
+		repos.saveAll(list);
+	}
+	
+	// 자료와 첨부 파일의 수를 자료 번호의 역순으로 출력
+	@Test
+	public void viewSummary() {
+		repos.getSummary().forEach(arr -> log.info(Arrays.toString(arr)));
 	}
 }

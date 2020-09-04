@@ -1,5 +1,7 @@
 package org.zerock.persistence;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -17,4 +19,8 @@ public interface PDSBoardRepository extends CrudRepository<PDSBoard, Long> {
 	@Query("DELETE FROM PDSFile f where f.fno = ?1")
 	public int deletePDSFile(Long fno);
 
+	// 자료와 첨부 파일의 수를 자료 번호의 역순으로 출력
+	// 앞에 단방향과 다른 점은 PDSBoard 객체의 files를 이용해 Outer Join을 처리한다는 점
+	@Query("SELECT p, count(f) FROM PDSBoard p LEFT OUTER JOIN p.files f WHERE p.pid > 0 GROUP BY p ORDER BY p.pid DESC")
+	public List<Object[]> getSummary();
 }
