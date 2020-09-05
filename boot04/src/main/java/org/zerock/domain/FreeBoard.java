@@ -20,7 +20,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
+@ToString(exclude="replies")
 @Entity
 @Table(name="tbl_freeboards")
 @EqualsAndHashCode(of="bno")

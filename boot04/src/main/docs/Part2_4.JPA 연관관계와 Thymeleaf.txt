@@ -308,6 +308,14 @@ Hibernate: create table tbl_free_replies (rno bigint not null auto_increment, re
 Hibernate: create table tbl_freeboards (bno bigint not null auto_increment, content varchar(255), regdate datetime, title varchar(255), updatedate datetime, writer varchar(255), primary key (bno)) engine=InnoDB
 - tbl_free_replies 테이블을 보면 board_bno라는 이름의 칼럼이 추가된 것을 볼 수 있음
 
+* 양방향 설정과 toString()
+- Lombok을 이용해 toString()을 자동으로 처리하는 것은 편리하지만, 양방향 참조를 이용하는 경우에는 양쪽에서 toString()을 실행하기 때문에, 무한반복 실행하는 문제가 생김
+- 양방향 참조일때 반드시 한쪽은 toString()에서 참조하는 객체를 출력하지 않도록 수정해야함 (@ToString에는 exclude 속성을 이용해 특정 인스턴스 변수를 제외시킬 수 있음)
+
+3_2. Repository 작성
+- 여러 엔티티들의 Repository 개수를 판단하는 데 가장 중요한 영향을 미치는 것은 엔티티 객체의 라이프사이클임
+- 각 엔티티가 별도 라이프사이클을 가진다면 별도의 Repository를 생성하는 것이 좋고, 그렇지 못하다면 Repository 역시 달라짐
+- 게시물의 작성과 댓글의 작성은 관계없이 별도로 이루어짐, 댓글 수정이나 삭제도 게시물 자체에는 영향을 주지 않으므로, 별도의 Repository로 작성하는것이 좋음
 
 
 
