@@ -3,7 +3,9 @@ package org.zerock.domain;
 import java.sql.Timestamp;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -38,8 +40,8 @@ public class FreeBoard {
 	@UpdateTimestamp
 	private Timestamp updatedate;
 	
-	// 일대다 관계
-	@OneToMany(mappedBy="board")
+	// 일대다 관계 (매여있다, 영속성 전이 설정, 즉시,지연 로딩 설정)
+	@OneToMany(mappedBy="board", cascade=CascadeType.ALL, fetch=FetchType.LAZY)
 	private List<FreeBoardReply> replies;
 	
 
