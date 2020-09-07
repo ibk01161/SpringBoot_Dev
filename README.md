@@ -81,3 +81,9 @@ Part2.5_ing
 * Thymeleaf 실습을 위한 프로젝트 생성
 * Thymeleaf 기본 설정
 * Thymeleaf 동작 확인
+
+# 200908
+Part2.5_ing
+* Thymeleaf 플러그인 설치
+* Thymeleaf 예제1_객체를 화면에 출력하기
+

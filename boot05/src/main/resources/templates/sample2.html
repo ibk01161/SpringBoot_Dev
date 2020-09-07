@@ -1,0 +1,15 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Thymeleaf3</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	<!-- th:text - 태그의 내용물로 문자열을 출력 -->
+	<h1 th:text="${vo}">Thymeleaf Test Page</h1>
+	
+	<!-- th:utext - HTML 자체의 출력 기능 -->
+	<div th:utext='${"<h3>" + vo.mid + "</h3>"}'></div>
+	<div th:text='${"<h3>" + vo.mid + "</h3>"}'></div>
+	
+</body>
+</html>
