@@ -87,3 +87,8 @@ Part2.5_ing
 * Thymeleaf 플러그인 설치
 * Thymeleaf 예제1_객체를 화면에 출력하기
 
+# 200909
+Part2.5_ing
+* Thymeleaf 예제2_리스트를 화면에 출력하기
+* Thymeleaf 예제3_지역변수의 선언, if ~ unless 제어 처리
+* Thymeleaf 예제4_인라인 스타일로 Thymeleaf 사용하기

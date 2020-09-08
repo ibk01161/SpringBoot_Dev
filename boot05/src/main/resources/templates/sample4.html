@@ -1,0 +1,34 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Thymeleaf3</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	
+	<!-- th:with를 이용해서 target이라는 변수 작성, 이 변수는 table태그 내에서만 유요한 전역변수임 -->
+	<table border="1" th:with="target='u0001'">
+		<tr>
+			<td>MID</td>
+			<td>MNAME</td>
+			<td>REGDATE</td>
+		</tr>
+		
+		<!-- 반복의 상태에 대한 변수를 지정하여, 필요한 추가 정보들을 추출 -->
+		<tr th:each="member : ${list}">
+			<!-- 삼항연산자 -->
+			<!-- <td th:text="${member.mid == target ? 'SECRET' : member.mid}">Doe</td> -->
+			
+			<!-- th:if ~ unless -->
+			<!-- mid가 target이면 <a>태그 출력, 아닌 경우에는 <p> 출력 -->
+			<td th:if="${member.mid}">
+				<a href="/modify" th:if="${member.mid == target}">MODIFY</a>
+				<p th:unless="${member.mid == target}">VIEW</p>
+			</td>
+			<td th:text="${member.mname}"></td>
+			<td th:text="${#dates.format(member.regdate, 'yyyy-MM-dd')}"></td>
+		</tr>
+		
+	</table>
+	
+</body>
+</html>

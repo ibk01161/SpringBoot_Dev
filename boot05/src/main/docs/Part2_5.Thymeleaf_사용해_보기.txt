@@ -69,7 +69,35 @@
 * HTML 출력하기 - utext
 - th:text와 달리 th:utext는 문자열이 아니라 HTML 자체를 출력하는 데 사용할 수 있음
 
+5_3_2. 리스트를 화면에 출력하기
+- 화면에서 가장 많이 사용하는 루프 처리는 th:each를 이용해서 처리할 수 있음, th:each는 리스트나, Iterable, Map, 배열 등을 사용할 수 있음
+- th:each에 사용하는 표현식은 th:each="var : ${list}" 와 같은 방식으로 작성, 'var'는 루프를 돌 때 n번째의 요소를 의미
+- 예제를 위해 여러 개의 MemberVO 객체를 리스트에 담아서 출력, Model로 전달된 객체는 JSP의 EL과 같은 형태로 사용 가능
+- 마지막에 사용한 '#dates.format()'은 Thymeleaf의 보조 객체로, 날짜와 관련된 처리에 유용하게 사용
+- th:each에는 반복의 상태에 대한 변수를 지정하여, 필요한 추가 정보들을 추출할 수 있음, th:each에 현재 상태에 대한 변수를 선언하면 다음과 같은 항목들을 사용할 수 있음
+1) index : 0부터 시작하는 인덱스 번호
+2) count : 1부터 시작하는 번호
+3) size : 현재 대상의 length, size
+4) odd/even : 현재 번호의 홀/짝수 여부
+5) first/last : 처음 요소인지 마지막 요소인지를 판단
+- th:each에는 iterState라는 추가 변수를 지정해서 사용하고, index나 size 등을 이용해 추가 데이터를 출력
 
+5_3_3. 지역변수의 선언, if ~ unless 제어 처리
+- Thymeleaf에서는 특정 범위에서만 유효한 지역변수를 th:with를 이용해서 선언할 수 있음
+- sample4() 작성 (기존 코드와 유사하지만, i%3으로 나머지 값 이용)
+- sample4.html은 기존 소스에 th:with를 추가, th:with를 이용해서 target이라는 이름의 변수 작성, 이 변수는 <table> 태그 내에서만 유효한 전역변수가 됨
+- 만일 목록을 출력할 때 member.mid 값이 'u0001'인 사용자만 다른 내용으로 출력하고 싶다면 th:if를 이용하거나 삼항 연산자를 이용해서 처리 가능 (u0001 대신 SECRET이라는 문자열로 보임)
+- 삼항 연산자를 이용하는 방식이 간편하긴 하지만 경우에 따라서 if ~ else 처리가 필요 (th:if ~ unless 이용)
+- th:if는 내부 식(expression)의 결과가 true인 경우에만 th:if 를 포함하는 태그 자체가 생성됨 (member.mid가 target과 같은 경우에는 <a> 태그 출력, 아닌 경우에는 <p> 태그 출력)
+
+5_3_4. 인라인 스타일로 Thymeleaf 사용하기
+- JSP 페이지를 작성하다 보면 가끔 EL을 이용해서 자바스크립트 코드를 작성하는 경우가 종종 있음, Thymeleaf에서는 이러한 경우에 별도 표기 방법 지원
+- th:inline 이라는 것을 이용해서 'javascript'나 'text'를 지정해서 사용
+- 예를 들어 화면에 result라는 결과를 문자열로 전달하는 경우 th:inline을 이용해 <script> 태그 내 Thymeleaf를 사용한다는 것을 명시
+- 주의 깊게 봐야 하는 부분은 <script> 태그 내에 th:inline 속성을 지정하는 부분, 코드를 브라우저의 '페이지 소스'로 보면 차이점이 있음
+- th:inline='javascript'를 지정한 코드에서는 자바스크립트 문자열로 제대로 생성 (var result = "SUCCESS";)
+- 그렇지 않은 경우에는 변수처럼 선언 (var result = SUCCESS;)
+- Thymeleaf의 inlining은 기본은 'text'로 지정되므로, 일반 태그를 작성할 때도 사용할 수 있음
 
 
 
