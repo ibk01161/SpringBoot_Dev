@@ -92,3 +92,8 @@ Part2.5_ing
 * Thymeleaf 예제2_리스트를 화면에 출력하기
 * Thymeleaf 예제3_지역변수의 선언, if ~ unless 제어 처리
 * Thymeleaf 예제4_인라인 스타일로 Thymeleaf 사용하기
+
+# 200910
+Part2.5_ing
+* Thymeleaf의 유틸리티 객체 테스트
+* Thymeleaf 링크 처리

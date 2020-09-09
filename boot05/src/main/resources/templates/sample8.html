@@ -1,0 +1,20 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Thymeleaf3</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+	
+	<ul>
+		<!-- 절대 경로 처리 -->
+		<li><a th:href="@{http://localhost:8080/sample1}">sample1</a></li>
+		<!-- 컨텍스트의 경로 반영 -->
+		<li><a th:href="@{/sample1}">sample1</a></li>
+		<!-- 현재 프로젝트가 '/'경로에서 실행되었기 때문에 두번째랑 같음 -->
+		<li><a th:href="@{~/sample1}">sample1</a></li>
+		<!-- 파라미터를 전달 하는 경우 -->
+		<li><a th:href="@{/sample1(p1='aaa', p2='bbb')}">sample1</a></li>
+	</ul>
+	
+</body>
+</html>
