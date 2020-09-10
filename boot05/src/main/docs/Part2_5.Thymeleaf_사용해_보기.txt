@@ -152,3 +152,37 @@
 - Thymeleaf의 링크 처리에서 조금 특이한 부분은 파라미터를 전달하는 경우
 - 일반적으로 직접 링크를 생성하기 위해 '파라미터의 이름 = 값' 의 형태로 작성하지만, Thymeleaf를 이용하면 (이름(키) = 값)의 형태로 링크를 생성할 수 있음 => <a href="/sample1?p1=aaa&amp;p2=bbb">sample1</a>
 
+5_6. Thymeleaf의 레이아웃 기능
+- Thymeleaf를 이용하면 기본적으로 제공하는 th:insert, th:replace, th:include와 같은 속성들을 이용해서 기존 페이지의 일부분을 다른 내용으로 쉽게 변경할 수 있음
+- Thymeleaf는 부분적인 화면의 처리 기능과 더불어, 화면 전체의 레이아웃을 지정하고, 페이지를 작성할 때 필요한 부분만을 교체해서 사용하는 템플릿 기능이 지원됨
+
+5_6_1. th:insert를 이용해서 페이지의 헤더와 푸터 처리하기
+- 예제를 위해 templates 폴더에 추가로 fragments 라는 폴더를 작성하고, 헤더와 푸터 html 작성
+
+5_6_2. Thymeleaf layout dialecct를 이용한 레이아웃 재사용하기
+- Thymeleaf에 기본적으로 포함된 라이브러리는 아니지만, Thymeleaf layout dialect를 이용하면 하나의 레이아웃을 작성하고 이를 재사용해서 여러 페이지에 동일한 레이아웃을 적용시킬 수 있음 (템플릿 상속)
+- 템플릿 상속을 이용하면 전체 레이아웃 구성 후 레이아웃 내에서 원하는 위치에 필요한 페이지들을 끼워 넣거나, 변경하는 작업이 가능해 짐, 개발 시 현재 본인이 작업하는 페이지의 내용만을 처리할 수 있다는 편리함이 있음
+- pom.xml에 Thymeleaf Layout Dialect 라이브러리 추가
+- 예제에서는 레이아웃 상속 기능을 적용해 보기 위해 HTML5 Boilerplate를 적용, HTML5 Boilerplate는 웹 페이지에서 가장 기본적으로 필요한 구조를 템플릿으로 만들어 둔 것
+- 예를 들어 기본적인 js, image 폴더들의 구조나 favicon, ico 파일, index.html 파일 등을 묶음으로 만들어 둔 다음, 이를 이용해서 전체 구조를 잡고 페이지를 추가하는 방식으로 사용할 수 있음
+- HTML5 Boilerplate를 다운받고 압출을 풀고 static폴더로 넣어줌
+- 레이아웃을 적용하기 위해 template 내에 layout폴더를 작성하고, layout1.html 파일 작성
+- layout1.html 파일의 내용은 index.html 을 그대로 복사해 추가, 파일 상단에 기존 Thymeleaf 네임스페이스 외에 layout을 위한 네임스페이스를 추가
+- 변경된 layout1.html에서 매번 페이지 제작 시 변경되는 영역은 'content-body'라고 표현된 부분과 'custom javascript' 라고 표현된 영역임
+
+* th:block과 layout:fragment
+- layout1.html에서 매번 변경되는 영역은 화면의 Thymeleaf 코드를 사용하는 'content-body' 영역과 매 페이지에서 필요한 Javascript 코드를 넣어주는 'custom javascript'영역임
+- layout:fragment는 <div>와 같이 실제로 보이는 영역에 적용해 주고, th:block은 아무런 태그가 없는 영역을 표시할 때 사용
+
+* 페이지에 레이아웃 적용하기
+- 컨트롤러를 호출하는 페이지에 레이아웃을 적용하기 위해 SampleController에 메소드 설계, templates 폴더 내 sample 폴더를 작성하고 hello.html 파일 생성
+- 레이아웃 적용 전 페이지가 정상적으로 동작하는지 확인
+- 브라우저 개발자 도구를 통해 확인해 보면 다른 리소스들은 필요로 하지 않았기 때문에 /sample/hello 라는 URL만 호출된 것이 보임
+- 레이아웃을 적용하려면 hello.html에 레이아웃을 사용할 수 있는 네임스페이스를 추가해 주어야 함
+- hello.html에서는 layout의 layout1.html을 이용하도록 설정되었고, layout1.html에서 필요한 부분의 코드를 추가
+- 이와 같이 변경된 코드를 브라우저에서 호출하면 레이아웃이 적용되면서 다른 리소스들을 호출하는 것을 볼 수 있음
+- 호출되는 내용을 보면 layout1.html 에서 필요한 css나 js 파일들을 호출하는 것을 알 수 있음
+- 현재 경로가 '/sample'로 시작했기 때문에 최종적으로 layout1.html에서 링크의 경로를 수정해 줘야 함 ('@{/}'의 경로를 이용해서 수정)
+- 브라우저에서 '/sample/hello'를 호출하면 작성된 페이지와 레이아웃, 리소스들이 모두 적용된 페이지를 볼 수 있게됨
+- 스프링 부트는 Thymeleaf 외에도 레이아웃을 사용할 수 있는 다양한 템플릿 기능들을 지원하지만, 이 책에서는 Thymeleaf를 사용해서 처리함
+

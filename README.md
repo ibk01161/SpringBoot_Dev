@@ -97,3 +97,8 @@ Part2.5_ing
 Part2.5_ing
 * Thymeleaf의 유틸리티 객체 테스트
 * Thymeleaf 링크 처리
+
+# 200911
+Part2.5_complete
+* th:insert를 이용해서 페이지의 Header와 Footer 처리
+* Thymeleaf의 레이아웃 기능 적용하기

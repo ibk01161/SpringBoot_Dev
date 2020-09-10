@@ -4,7 +4,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
-	
+
+	<div th:insert="~{fragments/header::header}"></div>
+	<div>
 	<ul>
 		<!-- 절대 경로 처리 -->
 		<li><a th:href="@{http://localhost:8080/sample1}">sample1</a></li>
@@ -15,6 +17,9 @@
 		<!-- 파라미터를 전달 하는 경우 -->
 		<li><a th:href="@{/sample1(p1='aaa', p2='bbb')}">sample1</a></li>
 	</ul>
+	</div>
+	
+	<div th:insert="~{fragments/footer::footer}"></div>
 	
 </body>
 </html>
