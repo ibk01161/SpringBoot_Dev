@@ -102,3 +102,10 @@ Part2.5_ing
 Part2.5_complete
 * th:insert를 이용해서 페이지의 Header와 Footer 처리
 * Thymeleaf의 레이아웃 기능 적용하기
+
+# 200912
+Part3.6_ing
+* Spring MVC 연동을 위한 프로젝트 생성 
+* 프로젝트 기본 구조 세팅
+* 컨트롤러 생성 후 테스트 페이지 확인
+* 개발을 위한 테스트 데이터 생성
