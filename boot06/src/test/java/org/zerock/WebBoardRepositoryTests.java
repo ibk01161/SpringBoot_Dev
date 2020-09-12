@@ -6,6 +6,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.zerock.domain.WebBoard;
@@ -40,4 +44,34 @@ public class WebBoardRepositoryTests {
 		
 	}
 	
+	// 페이징 처리
+	@Test
+	public void testList1() {
+		
+		Pageable pageable = PageRequest.of(0, 20, Direction.DESC, "bno");
+		
+		Page<WebBoard> result = repos.findAll(repos.makePredicate(null, null), pageable);
+		
+		log.info("------------------------------------------------------------------");
+		log.info("PAGE : " + result.getPageable());
+		log.info("------------------------------------------------------------------");
+		
+		result.getContent().forEach(board -> log.info("" + board));
+	}
+	
+	// 페이징, 검색 조건에 대한 처리
+	@Test
+	public void testList2() {
+		
+		Pageable pageable = PageRequest.of(0, 20, Direction.DESC, "bno");
+		
+		Page<WebBoard> result = repos.findAll(repos.makePredicate("t", "10"), pageable);
+		
+		log.info("------------------------------------------------------------------");
+		log.info("PAGE : " + result.getPageable());
+		log.info("------------------------------------------------------------------");
+		
+		result.getContent().forEach(board -> log.info("" + board));
+		
+	}
 }

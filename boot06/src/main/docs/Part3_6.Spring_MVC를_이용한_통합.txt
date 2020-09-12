@@ -44,7 +44,47 @@
 - insertDummies()는 1부터 300까지 bno값을 가지는 데이터 생성 후 데이터베이스에 정상적으로 insert 됐는지 확인
 - 항상 본격적인 개발 전 테스트용 더미 데이터를 넣어주는 과정을 개발 단계에 포함해 주는 것이 좋음
 
+6.2. 페이징, 검색 처리
+- 프로젝트의 기본 구성이 완성되었고, 기능을 테스트할 수 있는 데이터들이 있다면 먼저 리스트를 구현하도록 함 (리스트 구성은 단순 페이징과 검색 조건의 처리)
 
+6.2.1. Repository 페이징 테스트
+- 페이징에 대한 테스트는 QuerydslPredicateExecutor의 findAll()을 이용해 작성하고, Pageable을 사용
+- QuerydslPredicateExecutor의 findAll()은 Predicate 타입의 파라미터와 Pageable을 파라미터로 전달받을 수 있음
+- 파라미터로 전달하는 Predicate는 QWebBoard를 이용해 작성해야 함, 이를 위해 간단히 검색 조건과 키워드를 전달하면 Predicate를 생성하는 코드를 작성
+- Java8 버전부터는 인터페이스에 'default 메소드'를 추가해 코드를 추가할 수 있으므로, default 키워드를 이용해 인터페이스에서 직접 메소드의 내용을 구현해 줄 수 있음
+- makePredicate()는 검색에 필요한 타입 정보와 키워드를 이용해 적당한 쿼리를 생성 (아직 다양한 조건에 대한 처리가 없으므로 단지 'where bno > 0' 이라는 조건만 생성) 후 테스트 코드 작성
+- testList1()은 아직 검색 조건을 지정하지 않은 상태의 단순 페이징 처리, findAll()을 할 때 Predicate를 생성하는 부분에서 repos.makePredicate() 주의깊게 확인
+[log]
+Hibernate: select webboard0_.bno as bno1_0_, webboard0_.content as content2_0_, webboard0_.regdate as regdate3_0_, webboard0_.title as title4_0_, webboard0_.updatedate as updateda5_0_, webboard0_.writer as writer6_0_ from tbl_webboards webboard0_ where webboard0_.bno>? order by webboard0_.bno desc limit ?
+Hibernate: select count(webboard0_.bno) as col_0_0_ from tbl_webboards webboard0_ where webboard0_.bno>?
+------------------------------------------------------------------
+PAGE : Page request [number: 0, size 20, sort: bno: DESC]
+------------------------------------------------------------------
+WebBoard(bno=300, title=Sample Board Title 299, writer=user09, content=content Sample...299 of Board , regdate=2020-09-12 03:16:15.0, updatedate=2020-09-12 03:16:15.0)
+WebBoard(bno=299, title=Sample Board Title 298, writer=user08, content=content Sample...298 of Board , regdate=2020-09-12 03:16:15.0, updatedate=2020-09-12 03:16:15.0)
+WebBoard(bno=298, title=Sample Board Title 297, writer=user07, content=content Sample...297 of Board , regdate=2020-09-12 03:16:15.0, updatedate=2020-09-12 03:16:15.0)
+WebBoard(bno=297, title=Sample Board Title 296, writer=user06, content=content Sample...296 of Board , regdate=2020-09-12 03:16:15.0, updatedate=2020-09-12 03:16:15.0)
+...
+WebBoard(bno=282, title=Sample Board Title 281, writer=user01, content=content Sample...281 of Board , regdate=2020-09-12 03:16:15.0, updatedate=2020-09-12 03:16:15.0)
+WebBoard(bno=281, title=Sample Board Title 280, writer=user00, content=content Sample...280 of Board , regdate=2020-09-12 03:16:15.0, updatedate=2020-09-12 03:16:15.0)
+
+* 검색 조건 처리
+- 검색 조건이 없을 때 페이지 처리에 이상이 없는 것을 확인했으면, 검색 조건에 맞게 남은 부분 구현
+- makePredicate()는 파라미터로 전달되는 문자열을 이용해 switch를 처리하는 단순한 구조
+- 이러한 정도의 분기는 컨트롤러에서 다른 메소드를 호출하도록 처리할 수 있지만, 복잡한 연산을 처리해야 하는 상황에서는 이와 같은 구조가 조금 더 유용
+- testList2()의 검색 조건은 '제목'dp '10'이라는 문자열이 포함된 WebBoard 객체들에 대한 검색
+[log]
+Hibernate: select webboard0_.bno as bno1_0_, webboard0_.content as content2_0_, webboard0_.regdate as regdate3_0_, webboard0_.title as title4_0_, webboard0_.updatedate as updateda5_0_, webboard0_.writer as writer6_0_ from tbl_webboards webboard0_ where webboard0_.bno>? and (webboard0_.title like ? escape '!') order by webboard0_.bno desc limit ?
+------------------------------------------------------------------
+PAGE : Page request [number: 0, size 20, sort: bno: DESC]
+------------------------------------------------------------------
+WebBoard(bno=211, title=Sample Board Title 210, writer=user00, content=content Sample...210 of Board , regdate=2020-09-12 03:16:14.0, updatedate=2020-09-12 03:16:14.0)
+WebBoard(bno=111, title=Sample Board Title 110, writer=user00, content=content Sample...110 of Board , regdate=2020-09-12 03:16:14.0, updatedate=2020-09-12 03:16:14.0)
+WebBoard(bno=110, title=Sample Board Title 109, writer=user09, content=content Sample...109 of Board , regdate=2020-09-12 03:16:14.0, updatedate=2020-09-12 03:16:14.0)
+WebBoard(bno=109, title=Sample Board Title 108, writer=user08, content=content Sample...108 of Board , regdate=2020-09-12 03:16:14.0, updatedate=2020-09-12 03:16:14.0)
+...
+WebBoard(bno=101, title=Sample Board Title 100, writer=user00, content=content Sample...100 of Board , regdate=2020-09-12 03:16:14.0, updatedate=2020-09-12 03:16:14.0)
+WebBoard(bno=11, title=Sample Board Title 10, writer=user00, content=content Sample...10 of Board , regdate=2020-09-12 03:16:13.0, updatedate=2020-09-12 03:16:13.0)
 
 
 
