@@ -114,3 +114,7 @@ Part3.6_ing
 # 200913
 Part3.6_ing
 * PageVO 생성 후 컨트롤러에서 페이징 처리
+
+# 200914
+Part3.6_ing
+* Repository와의 연동 처리
