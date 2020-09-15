@@ -118,3 +118,7 @@ Part3.6_ing
 # 200914
 Part3.6_ing
 * Repository와의 연동 처리
+
+# 200915
+Part3.6_ing
+* list.html 수정

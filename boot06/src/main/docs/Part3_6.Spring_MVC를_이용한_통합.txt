@@ -143,7 +143,9 @@ Hibernate: select count(webboard0_.bno) as col_0_0_ from tbl_webboards webboard0
 2020-09-14 23:27:50.160  INFO 11232 --- [io-8080-exec-10] o.zerock.controller.WebBoardController   : result : Page 1 of 30 containing org.zerock.domain.WebBoard instances
 2020-09-14 23:27:50.160  INFO 11232 --- [io-8080-exec-10] o.zerock.controller.WebBoardController   : ------------------------------------------------------------------
 
-
+* 화면의 출력과 페이징 처리
+- 실제 화면에 내용을 출력하는 부분은 부트스트랩의 화면 컴포넌트 중 List 이용, 페이징처리는 Pagination을 이용
+- 리스트 내용은 ${result.content}이므로 'th:each'를 이용해 출력
 
 
 
