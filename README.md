@@ -122,3 +122,7 @@ Part3.6_ing
 # 200915
 Part3.6_ing
 * list.html 수정
+
+# 200916
+Part3.6_ing
+* 페이징 처리 할 PageMaker 클래스 작성
