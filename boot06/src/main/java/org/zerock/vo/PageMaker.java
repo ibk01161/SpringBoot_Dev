@@ -42,6 +42,14 @@ public class PageMaker<T> {
 		this.totalPageNum = result.getTotalPages();
 		this.pageList = new ArrayList<>();
 		
+		log.info("======== PageMaker ========");
+		log.info("result : " + result);
+		log.info("currentPage : " + currentPage);
+		log.info("currentPageNum : " + currentPageNum);
+		log.info("totalPageNum : " + totalPageNum);
+		log.info("pageList : " + pageList);
+		
+		
 		calcPages();
 		
 	}

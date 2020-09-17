@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.zerock.domain.WebBoard;
 import org.zerock.persistence.WebBoardRepository;
+import org.zerock.vo.PageMaker;
 import org.zerock.vo.PageVO;
 
 import lombok.extern.java.Log;
@@ -50,7 +51,7 @@ public class WebBoardController {
 	}*/
 	
 	// 리스트 출력_페이징 처리(Repository와 연동 처리)
-	@GetMapping("/list")
+	/*@GetMapping("/list")
 	public void list(PageVO vo, Model model) {
 		
 		Pageable page = vo.makePageable(0, "bno");
@@ -65,5 +66,23 @@ public class WebBoardController {
 		model.addAttribute("result", result);
 		
 	}
+	*/
 	
+	// 리스트 출력_페이징 처리(PageMaker 사용)
+	@GetMapping("/list")
+	public void list(PageVO vo, Model model) {
+		
+		Pageable page = vo.makePageable(0, "bno");
+		
+		Page<WebBoard> result = repos.findAll(repos.makePredicate(null, null), page);
+		
+		log.info("------------------------------------------------------------------");
+		log.info("page : " + page);
+		log.info("result : " + result);
+		log.info("TOTAL PAGE NUMBER : " + result.getTotalPages());
+		log.info("------------------------------------------------------------------");
+		
+		model.addAttribute("result", new PageMaker(result));
+		
+	}
 }

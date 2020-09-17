@@ -126,3 +126,8 @@ Part3.6_ing
 # 200916
 Part3.6_ing
 * 페이징 처리 할 PageMaker 클래스 작성
+
+# 200917
+Part3.6_ing
+* PageMaker를 이용하도록 컨트롤러 수정
+* list.html에 페이지 번호 출력
