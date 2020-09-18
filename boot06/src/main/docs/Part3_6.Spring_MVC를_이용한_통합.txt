@@ -201,7 +201,15 @@ Hibernate: select count(webboard0_.bno) as col_0_0_ from tbl_webboards webboard0
 - 현재 페이지 번호를 구분하기 위해 Thymeleaf의 th:classappend를 적용해 특별한 경우에만 특정 CSS 클래스를 추가하도록 할 수 있음
 - th:classappend와 삼항연산자를 이용해서 간단하게 'page-item active' 라는 클래스를 지정하면 화면에서 해당 페이지 숫자가 진하게 보이는 것을 확인할 수 있음
 
+* 페이지 이동 처리
+- 페이지 이동이 제대로 동작하기 위해 우선 태그의 링크 내용에서도 페이지 정보가 제대로 보이도록 <a> 태그의 href 속성값을 페이지 번호로 지정 (<a th:href="${p.pageNumber} + 1">)
+- 정상적인 화면 이동이 되려면 링크를 처리하는 JavaScript를 작성해야함
 
+* 페이지 이동을 위한 JavaScript 처리
+- 페이지 이동을 위한 JavaScript는 layout1.html에 적용된 jQuery를 이용해서 처리
+- 내부적으로는 <form> 태그를 생성하고, 이를 이용해서 submit을 하는 방식으로 처리함, 이를 위해 list.html에 <form> 태그를 추가
+- 사용자가 페이지 번호를 클릭할 때 <a> 태그의 기본 동작인 '이동'을 막는 대신 <form> 태그 내의 name='page'인 태그 값을 변경한 뒤 submit 하도록 작성
+- 작성 후 게시물의 내용을 <table>로 정리해줌
 
 
 

@@ -131,3 +131,8 @@ Part3.6_ing
 Part3.6_ing
 * PageMaker를 이용하도록 컨트롤러 수정
 * list.html에 페이지 번호 출력
+
+# 200918
+Part3.6_ing
+* 페이지 이동 처리 및 javaScript 적용
+* list.html에 게시물 내용 부분 <table>로 정리
