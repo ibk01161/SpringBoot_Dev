@@ -17,6 +17,9 @@ public class PageVO {
 	private int page;
 	private int size;
 	
+	private String keyword;
+	private String type;
+	
 	public PageVO() {
 		this.page = 1;
 		this.size = DEFAULT_SIZE;
@@ -40,6 +43,22 @@ public class PageVO {
 		
 	}
 	
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
 	// 전달되는 파라미터를 이용해서 최종적으로 PageRequest로 Pageable 객체 만듬
 	public Pageable makePageable(int direction, String... props) {
 		

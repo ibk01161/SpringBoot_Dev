@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.zerock.domain.WebBoard;
 import org.zerock.persistence.WebBoardRepository;
@@ -68,13 +69,13 @@ public class WebBoardController {
 	}
 	*/
 	
-	// 리스트 출력_페이징 처리(PageMaker 사용)
+	// 리스트 출력_페이징 처리(PageMaker 사용) 및 검색 처리
 	@GetMapping("/list")
-	public void list(PageVO vo, Model model) {
+	public void list(@ModelAttribute("pageVO") PageVO vo, Model model) {
 		
 		Pageable page = vo.makePageable(0, "bno");
 		
-		Page<WebBoard> result = repos.findAll(repos.makePredicate(null, null), page);
+		Page<WebBoard> result = repos.findAll(repos.makePredicate(vo.getType(), vo.getKeyword()), page);
 		
 		log.info("------------------------------------------------------------------");
 		log.info("page : " + page);
