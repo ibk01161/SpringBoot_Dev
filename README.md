@@ -137,6 +137,6 @@ Part3.6_ing
 * 페이지 이동 처리 및 javaScript 적용
 * list.html에 게시물 내용 부분 <table>로 정리
 
-# 200918
+# 200919
 Part3.6_ing
 * 검색 조건 처리 구현	
