@@ -7,7 +7,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.zerock.domain.WebBoard;
 import org.zerock.persistence.WebBoardRepository;
 import org.zerock.vo.PageMaker;
@@ -84,6 +86,32 @@ public class WebBoardController {
 		log.info("------------------------------------------------------------------");
 		
 		model.addAttribute("result", new PageMaker(result));
+		
+	}
+	
+	// 게시물 등록화면
+	@GetMapping("/register")
+	public void register(@ModelAttribute("vo") WebBoard vo) {
+		
+		log.info("========================================");
+		log.info("register get............");
+		log.info("========================================");
+		
+	}
+	
+	// 게시물 등록
+	@PostMapping("/register")
+	public String register(@ModelAttribute("vo") WebBoard vo, RedirectAttributes rttr) {
+		
+		log.info("========================================");
+		log.info("register post............");
+		log.info("" + vo);
+		log.info("========================================");
+		
+		repos.save(vo);
+		rttr.addFlashAttribute("msg", "success");
+		
+		return "redirect:/boards/list";
 		
 	}
 }
