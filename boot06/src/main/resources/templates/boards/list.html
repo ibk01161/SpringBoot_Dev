@@ -108,6 +108,18 @@
 			formObj.submit();
 		});
 		
+		$('.boardLink').click(function(e) {
+			e.preventDefault();
+			
+			var Board_bno = $(this).attr('href');
+			console.log("bno : " + Board_bno);
+			
+			formObj.attr("action",[[@{'/boards/view'}]]);
+			formObj.append("<input type='hidden' name='bno' value='" + Board_bno + "'>");
+			
+			formObj.submit();
+		});
+		
 	});
 	
 	// msg로 등록 알림 처리
