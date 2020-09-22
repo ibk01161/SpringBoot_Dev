@@ -126,4 +126,64 @@ public class WebBoardController {
 		repos.findById(bno).ifPresent(board -> model.addAttribute("vo", board));
 		
 	}
+	
+	// 게시물 수정 화면
+	@GetMapping("/modify")
+	public void modify(Long bno, @ModelAttribute("pageVO") PageVO vo, Model model) {
+		
+		log.info("==================================");
+		log.info("modify_get()_BNO : " + bno);
+		log.info("==================================");
+		
+		repos.findById(bno).ifPresent(board -> model.addAttribute("vo", board));
+		
+	}
+	
+	// 게시물 수정
+	@PostMapping("/modify")
+	public String modify(WebBoard board, PageVO vo, RedirectAttributes rttr) {
+		
+		log.info("==================================");
+		log.info("modify_post()_board : " + board);
+		log.info("==================================");
+		
+		repos.findById(board.getBno()).ifPresent(origin -> {
+			origin.setTitle(board.getTitle());
+			origin.setContent(board.getContent());
+			
+			repos.save(origin);
+			rttr.addFlashAttribute("msg", "success_modify");
+			rttr.addAttribute("bno", origin.getBno());
+		});
+		
+		// 페이징과 검색했던 결과로 이동하는 경우
+		rttr.addFlashAttribute("page", vo.getPage());
+		rttr.addFlashAttribute("size", vo.getSize());
+		rttr.addFlashAttribute("type", vo.getType());
+		rttr.addFlashAttribute("keyword", vo.getKeyword());
+		
+		return "redirect:/boards/list";
+		
+	}
+	
+	// 게시물 삭제
+	@PostMapping("/delete")
+	public String delete(Long bno, PageVO vo, RedirectAttributes rttr) {
+		
+		log.info("==================================");
+		log.info("delete()_BNO : " + bno);
+		log.info("==================================");
+		
+		repos.deleteById(bno);
+		
+		rttr.addFlashAttribute("msg", "success_delete");
+		
+		// 페이징과 검색했던 결과로 이동하는 경우
+		rttr.addFlashAttribute("page", vo.getPage());
+		rttr.addFlashAttribute("size", vo.getSize());
+		rttr.addFlashAttribute("type", vo.getType());
+		rttr.addFlashAttribute("keyword", vo.getKeyword());
+		
+		return "redirect:/boards/list";
+	}
 }
