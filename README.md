@@ -157,3 +157,8 @@ Part3.6_complete
 # 200923
 Part3.7_ing
 * 프로젝트 생성
+
+# 200924
+Part3.7_ing
+* REST 방식의 이해
+* 댓글 JPA 설계
