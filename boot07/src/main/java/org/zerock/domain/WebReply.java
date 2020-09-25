@@ -13,6 +13,8 @@ import javax.persistence.Table;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -40,6 +42,7 @@ public class WebReply {
 	private Timestamp updatedate;
 
 	// 양방향 설정
+	@JsonIgnore
 	@ManyToOne(fetch=FetchType.LAZY)
 	private WebBoard board;
 	

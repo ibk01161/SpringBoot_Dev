@@ -162,3 +162,8 @@ Part3.7_ing
 Part3.7_ing
 * REST 방식의 이해
 * 댓글 JPA 설계
+
+# 200925
+Part3.7_ing
+* 댓글 Repository 생성 및 테스트 데이터 추가
+* 댓글 등록 기능 구현

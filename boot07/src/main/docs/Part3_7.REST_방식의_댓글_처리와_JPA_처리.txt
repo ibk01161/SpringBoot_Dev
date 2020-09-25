@@ -52,3 +52,33 @@ Hibernate: alter table tbl_webreplies add constraint FKoqessctbkmr17s2vyoy825r2s
 - 문제는 양방향일 경우 이러한 변환이 상호 호출되기 때문에 무한히 반복해서 생성하는 문제가 생길 수 있음 (Lombok의 toStirng()이 상호 호출되는 것과 동일한 문제)
 - 이를 해결하기 위해 특정한 속성은 JSON으로 변환되지 않도록 @JsonIgnore 어노테이션 적용
 - @JsonIgnore는 객체를 JSON 형태로 만들 때 제외시켜주기 때문에 최종적으로 WebReply 객체를 변환한 JSON 데이터에서는 WebBoard와 관련된 내용은 제외됨
+
+7.2.2. ReplyRepository 추가
+- WebReply는 단독으로 CRUD 작업이 가능하기 때문에 별도의 Repository를 생성하는 것이 좋음 (댓글 내용은 특별히 검색 처리를 하지 않을 것이므로, QuerydslPredicateExcuter를 추가하지 않음)
+
+7.2.3. WebReplyRepository 테스트
+- 더미 데이터를 추가하는 테스트 코드 작성, Test 폴더에 Test 클래스 작성
+- testInsertReplies()의 내용은 지정된 게시물의 번호를 이용해 댓글을 10개씩 추가
+
+7.3. ReplyController의 설계
+- 댓글은 REST 방식으로 처리하기로 결정했다면, 가장 중요한 결정은 '각 작업을 위한 URL의 설계', REST방식에서 자원은 보통 복수형을 사용하므로 '/replis'를 이용하는 형태로 시작
+1) 댓글 추가 - POST - /replis/게시물 번호
+2) 댓글 삭제 - DELETE - /replis/게시물 번호/댓글 번호
+3) 댓글 수정 - PUT - /replis/게시물 번호
+4) 모든 댓글- GET - /replis/게시물 번호
+- URI를 어떤 방식으로 만들 것인지 결정했다면 해당 방식으로 URL이 제대로 동작하는지 확인해야함, 컨트롤러 추가 (@RestController 어노테이션 추가, WebReplyRepository 주입)
+
+7.3.1. 특정 게시물의 댓글 등록 처리
+- 화면상에서의 댓글 등록 처리는 Ajax를 이용, 이를 위해 전달되는 데이터를 JSON 형태로 처리
+- 이 작업을 위해 @PathVariable과 @RequestBody 어노테이션 활용
+- @PathVariable은 URI의 일부를 파라미터로 받기 위해 사용하는 어노테이션, @RequestBody는 JSON으로 전달되는 데이터를 객체로 자동으로 변환하도록 처리하는 역할
+- 컨트롤러의 메소드들의 리턴 타입은 특이하게 ResponseEntity 타입을 이용
+- ReponseEntity는 코드를 이용해 직접 Http Response의 상태 코드와 데이터를 직접 제어해서 처리할 수 있는 장점이 있음
+- addReply()에서는 우선적으로 HTTP의 상태 코드 중에 201을 의미하는 'created'라는 메시지를 전송하도록 함, 작성된 메소드에 대한 테스트는 REST 방식을 호출하는 프로그램을 이용하는 것이 편리
+
+
+
+
+
+
+
