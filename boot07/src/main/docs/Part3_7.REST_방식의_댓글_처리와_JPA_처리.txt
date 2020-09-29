@@ -129,5 +129,14 @@ Hibernate: alter table tbl_webreplies add constraint FKoqessctbkmr17s2vyoy825r2s
 - 댓글 목록을 화면에 출력하는 부분은 printList() 라는 함수를 이용해 별도로 분리, 이 함수는 나중에 댓글 추가, 수정, 삭제 시에도 댓글 목록을 다시 가져와서 출력할 때 사용해야 하기 때문
 - $(document).ready() 아래에는 즉시 실행 함수를 이용해 replyManager.getAll()을 호출하도록 작성 후 댓글 출력 테스트
 
+7.4.2. 댓글 추가
+- 댓글 추가 작업은 부트스트랩의 Modal (원래 화면 위에 입력 등 할 수 있는 화면이 보이는 방으로, 창을 닫기 전까지는 어떠한 작업도 진행할 수 없도록 함, BootStrap은 Modal을 약간의 CSS 와 JavaScript를 이용해 처리할 수 있음)을 활용
+- 우선 화면에서 Modal을 보여주는 부분부터 작성, 댓글 리스트의 가장 아래쪽에 버튼을 추가하고, 버튼을 클릭하면 Modal 창을 보여주도록 처리
+- JavaScript에서 Mode 변수는 Modal 창 자체를 댓글 수정, 삭제에도 사용할 수 있기 때문에 구분을 위해 작성, 화면에서는 댓글 추가 버튼을 누르면 Modal 창이 뜨게 됨
 
+* 댓글 저장
+- 댓글 저장 작업은 reply.js에서 Ajax로 서버를 호출하는 부분과 화면에서 데이터를 수집하는 부분으로 구분됨
+- 화면에서 댓글 테이블 밑의 '댓글 추가' 버튼을 클릭하면, mode 변수의 값은 'ADD'가 되고 Modal 창이 보이게 됨, Modal 창에서는 '저장' 버튼을 클릭하면 이에 맞는 처리를 함
+- 댓글 추가 작업은 댓글의 데이터를 수집해 객체를 만들고, replyManager.add()를 호출
+- 이후 현재 게시물의 모든 댓글들이 반환되므로, printList()를 이용해 출력하고, Modal 창을 다시 감추게 함, 이때 댓글 추가 alert창을 보여주고 Modal 창의 내용을 지워줌, reply.js 에서 add() 함수 수정 ($.ajax 처리)
 

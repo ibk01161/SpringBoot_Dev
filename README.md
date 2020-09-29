@@ -135,8 +135,7 @@ Part3.6_ing
 # 200918
 Part3.6_ing
 * 페이지 이동 처리 및 javaScript 적용
-* list.html에 게시물 내용 부분 <table>로 정리
-  
+* list.html에 게시물 내용 부분 <'table'>로 정리
 
 # 200919
 Part3.6_ing
@@ -180,4 +179,8 @@ Part3.7_ing
 # 200928
 Part3.7_ing
 * 댓글 처리를 위한 reply.js 구현
-* 댓글 출력 기능 구현(html)
+* 댓글 출력 기능 구현(html + Ajax)
+
+# 200929
+Part3.7_ing
+* 댓글 등록 기능 구현(html + Ajax)
