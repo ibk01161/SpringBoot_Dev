@@ -184,3 +184,7 @@ Part3.7_ing
 # 200929
 Part3.7_ing
 * 댓글 등록 기능 구현(html + Ajax)
+
+# 200930
+Part3.7_ing
+* 댓글 삭제, 수정 기능 구현(html + Ajax)
