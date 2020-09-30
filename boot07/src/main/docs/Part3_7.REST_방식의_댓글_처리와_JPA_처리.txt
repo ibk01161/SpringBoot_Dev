@@ -140,3 +140,20 @@ Hibernate: alter table tbl_webreplies add constraint FKoqessctbkmr17s2vyoy825r2s
 - 댓글 추가 작업은 댓글의 데이터를 수집해 객체를 만들고, replyManager.add()를 호출
 - 이후 현재 게시물의 모든 댓글들이 반환되므로, printList()를 이용해 출력하고, Modal 창을 다시 감추게 함, 이때 댓글 추가 alert창을 보여주고 Modal 창의 내용을 지워줌, reply.js 에서 add() 함수 수정 ($.ajax 처리)
 
+7.4.3. 댓글 삭제 처리
+- 댓글 삭제 처리는 우선적으로 댓글을 클릭해서 Modal 창에 내용을 보여 준 다음 처리, 이 경우 댓글 번호와 게시물 번호 필요
+- 화면상 특정 댓글을 선택하면, rno 변수의 값은 해당 댓글의 번호가 되고, Modal 창에는 댓글 내용과 댓글 작성자를 볼 수 있음
+- 댓글을 삭제할 수 있도록 'Delete' 버튼이 필요하므로 Modal 창에 'Delete' 버튼을 추가
+- 추가된 'delModalBtn'은 댓글을 추가할 때에는 jQuery의 hide()를 이용해서 안보이도록 처리, 실제 댓글 삭제 처리는 화면에서 'Delete' 버튼을 클릭하면서 이루어짐, reply.js 에서는 DELETE 방식으로 Ajax 호출해서 처리
+- 화면상에서는 댓그링 삭제되었다는 alert창이 뜨고, 목록이 갱신되는 것을 확인할 수 있음
+
+7.4.4. 댓글 수정 처리
+- 댓글 수정은 댓글의 모든 내용을 JavaScript의 객체로 구성한 다음 replyManager로 전달해 처리, Ajax의 전송 방식은 PUT 방식으로 처리
+- mode의 값이 'MOD' 인 경우에는 'replyText, rno, bno'를 하나의 객체로 묶어 replyManager의 update를 호출, 이후 댓글 등록과 비슷하므로, afterAll() 함수로 공통의 코드를 분리
+
+
+
+
+
+
+
