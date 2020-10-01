@@ -156,11 +156,8 @@
 				
 				if (result) {
 					replyManager.add(obj, function(list) {
-						printList(list);
 						alert("새로운 댓글이 추가되었습니다.");
-						$('#myModal').modal('hide');
-						replyTextObj.val("");
-						replyerObj.val("");
+						afterAll(list)
 					});
 				} else {
 					return;
@@ -215,11 +212,8 @@
 			
 			if (result) {
 				replyManager.remove(obj, function(list) {
-					printList(list);
 					alert("댓글이 삭제 되었습니다.");
-					$('#myModal').modal('hide');
-					replyTextObj.val("");
-					replyerObj.val("");
+					afterAll(list)
 				});
 			} else {
 				return;
