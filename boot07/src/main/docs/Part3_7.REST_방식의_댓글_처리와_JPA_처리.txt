@@ -196,6 +196,54 @@ Hibernate: select replies0_.board_bno as board_bn6_1_0_, replies0_.rno as rno1_1
 4) 테스트 코드의 작성 및 완성
 - 별도 클래스를 만들어 테스트하는 것이 더 좋음, 기존 test 폴더에 추가
 - 가장 먼저 테스트해야 하는 내용은 사용자 정의 인터페이스의 구현 클래스가 실제로 동작하는지 확인, 테스트 코드를 실행하면 구현된 CustomCrudRespositoryImpl의 내용이 처리되면서 로그가 출력되는 것을 확인 
+[log]
+2020-10-03 01:59:06.254  INFO 19868 --- [           main] o.z.p.CustomCrudRepositoryImpl           : =======================
+2020-10-03 01:59:06.255  INFO 19868 --- [           main] o.z.p.CustomCrudRepositoryImpl           : TYPE : t
+2020-10-03 01:59:06.255  INFO 19868 --- [           main] o.z.p.CustomCrudRepositoryImpl           : KEYWORD : 10
+2020-10-03 01:59:06.256  INFO 19868 --- [           main] o.z.p.CustomCrudRepositoryImpl           : PAGE : Page request [number: 0, size 10, sort: bno: DESC]
+2020-10-03 01:59:06.256  INFO 19868 --- [           main] o.z.p.CustomCrudRepositoryImpl           : =======================
+2020-10-03 01:59:06.258  INFO 19868 --- [           main] org.zerock.CustomRepositoryTests         : null
 
+=> 아직 정상적인 처리가 되지 않았으므로 결과는 null로 출력
+- 테스트가 끝났다면 기존의 페이징 처리를 구현, Querydls의 Qdomain 등을 이용할 수 있음
+- 기존 코드에서 변경된 점은 QWebBoard를 이용하는 부분과 Tuple 타입을 이용하는 부분, Tuple에는 where(), orderBy() 등의 기능을 이용해 원하는 조건을 제어할 수 있음, 아직 null이 전달되지만, 로그는 정상실행
+[log]
+Hibernate: select webboard0_.bno as col_0_0_, webboard0_.title as col_1_0_, webboard0_.writer as col_2_0_, webboard0_.regdate as col_3_0_ from tbl_webboards webboard0_ where webboard0_.bno>? order by webboard0_.bno desc limit ?
+2020-10-03 02:25:56.404  INFO 5052 --- [           main] o.z.p.CustomCrudRepositoryImpl           : CstmReposImpl : [[303, test2222, user03, 2020-09-20 19:43:21.0], [302, test, user00, 2020-09-20 19:42:22.0], [299, Sample Board Title 298, user08, 2020-09-12 03:16:15.0], [298, Sample Board Title 297, user07, 2020-09-12 03:16:15.0], [297, Sample Board Title 296, user06, 2020-09-12 03:16:15.0], [296, Sample Board Title 295, user05, 2020-09-12 03:16:15.0], [295, Sample Board Title 294, user04, 2020-09-12 03:16:15.0], [294, Sample Board Title 293, user03, 2020-09-12 03:16:15.0], [293, Sample Board Title 292, user02, 2020-09-12 03:16:15.0], [292, Sample Board Title 291, user01, 2020-09-12 03:16:15.0]]
+2020-10-03 02:25:56.406  INFO 5052 --- [           main] org.zerock.CustomRepositoryTests         : null
+=> 실행되는 SQL문의 처리 결과들이 Tuple로 처리된 것을 확인
+- 메소드의 리턴 타입 처리를 위해 수정, 변경된 부분은 tuple의 fetch()결과를 Object[]로 처리와 PageImpl 클래스를 이용해 Page<Object[]>의 결과를 만들어 내는 부분
+- 테스트 코드에서도 수정해서 Page<Object[]>로 반환된 결과 확인
+[log]
+Hibernate: select webboard0_.bno as col_0_0_, webboard0_.title as col_1_0_, webboard0_.writer as col_2_0_, webboard0_.regdate as col_3_0_ from tbl_webboards webboard0_ where webboard0_.bno>? order by webboard0_.bno desc limit ?
+Hibernate: select count(webboard0_.bno) as col_0_0_ from tbl_webboards webboard0_ where webboard0_.bno>?
+2020-10-03 02:44:50.785  INFO 19424 --- [           main] org.zerock.CustomRepositoryTests         : Page 1 of 31 containing [Ljava.lang.Object; instances
+2020-10-03 02:44:50.789  INFO 19424 --- [           main] org.zerock.CustomRepositoryTests         : TOTAL PAGES : 31
+2020-10-03 02:44:50.789  INFO 19424 --- [           main] org.zerock.CustomRepositoryTests         : TOTAL SIZE : 301
+2020-10-03 02:44:50.790  INFO 19424 --- [           main] org.zerock.CustomRepositoryTests         : [303, test2222, user03, 2020-09-20 19:43:21.0]
+2020-10-03 02:44:50.790  INFO 19424 --- [           main] org.zerock.CustomRepositoryTests         : [302, test, user00, 2020-09-20 19:42:22.0]
+2020-10-03 02:44:50.791  INFO 19424 --- [           main] org.zerock.CustomRepositoryTests         : [299, Sample Board Title 298, user08, 2020-09-12 03:16:15.0]
+...
+2020-10-03 02:44:50.792  INFO 19424 --- [           main] org.zerock.CustomRepositoryTests         : [292, Sample Board Title 291, user01, 2020-09-12 03:16:15.0]
+=> 결과가 정상적으로 나오면 최종적으로 WebReply와의 조인을 처리해 주고, 검색 조건들을 처리
+- LEFT OUTER JOIN을 처리하기 위해 QWebReply 엔티티를 추가하고, 이것으로 Tuple의 leftJoin()을 이용, 검색 조건 처리와 groupBy() 등 처리 추가 후 작성자가 user08인 게시물 검색 테스트
+[log]
+Hibernate: select webboard0_.bno as col_0_0_, webboard0_.title as col_1_0_, count(webreply1_.rno) as col_2_0_, webboard0_.writer as col_3_0_, webboard0_.regdate as col_4_0_ from tbl_webboards webboard0_ left outer join tbl_webreplies webreply1_ on (webboard0_.bno=webreply1_.board_bno) where webboard0_.bno>? and (webboard0_.writer like ? escape '!') group by webboard0_.bno order by webboard0_.bno desc limit ?
+Hibernate: select count(distinct webboard0_.bno) as col_0_0_ from tbl_webboards webboard0_ left outer join tbl_webreplies webreply1_ on (webboard0_.bno=webreply1_.board_bno) where webboard0_.bno>? and (webboard0_.writer like ? escape '!')
+2020-10-03 03:24:52.640  INFO 19728 --- [           main] org.zerock.CustomRepositoryTests         : Page 1 of 3 containing [Ljava.lang.Object; instances
+2020-10-03 03:24:52.640  INFO 19728 --- [           main] org.zerock.CustomRepositoryTests         : TOTAL PAGES : 3
+2020-10-03 03:24:52.640  INFO 19728 --- [           main] org.zerock.CustomRepositoryTests         : TOTAL SIZE : 30
+2020-10-03 03:24:52.641  INFO 19728 --- [           main] org.zerock.CustomRepositoryTests         : [299, Sample Board Title 298, 10, user08, 2020-09-12 03:16:15.0]
+2020-10-03 03:24:52.641  INFO 19728 --- [           main] org.zerock.CustomRepositoryTests         : [289, Sample Board Title 288, 0, user08, 2020-09-12 03:16:15.0]
+...
+2020-10-03 03:24:52.642  INFO 19728 --- [           main] org.zerock.CustomRepositoryTests         : [209, Sample Board Title 208, 0, user08, 2020-09-12 03:16:14.0]
+
+7.5.4. 컨트롤러와 화면 처리
+- 컨트롤러는 CustomCrudRepository를 주입받도록 수정하고, list()를 수정, 게시물 리스트 화면인 list.html은 Object[]를 처리하도록 수정
+- SQL에서 서버에서 실행되는 쿼리가 기존과 달리 쿼리문이 한 번 실행되는지 확인
+[log]
+Hibernate: select webboard0_.bno as col_0_0_, webboard0_.title as col_1_0_, count(webreply1_.rno) as col_2_0_, webboard0_.writer as col_3_0_, webboard0_.regdate as col_4_0_ from tbl_webboards webboard0_ left outer join tbl_webreplies webreply1_ on (webboard0_.bno=webreply1_.board_bno) where webboard0_.bno>? group by webboard0_.bno order by webboard0_.bno desc limit ?
+Hibernate: select count(distinct webboard0_.bno) as col_0_0_ from tbl_webboards webboard0_ left outer join tbl_webreplies webreply1_ on (webboard0_.bno=webreply1_.board_bno) where webboard0_.bno>?
+- 사용자 정의 쿼리를 생성하는 방식은 단계가 조금 복잡하기는 하지만, 코드를 이용해 마음대로 조작할 수 있다는 장점이 있음, 리플렉션 등을 이용한다면 좀 더 유연한 JQPL을 생성해 처리할 수 있음
 
 

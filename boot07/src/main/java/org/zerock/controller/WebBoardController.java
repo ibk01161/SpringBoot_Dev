@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.zerock.domain.WebBoard;
+import org.zerock.persistence.CustomCrudRepository;
 import org.zerock.persistence.WebBoardRepository;
 import org.zerock.vo.PageMaker;
 import org.zerock.vo.PageVO;
@@ -23,7 +24,8 @@ import lombok.extern.java.Log;
 public class WebBoardController {
 	
 	@Autowired
-	private WebBoardRepository repos;
+	//private WebBoardRepository repos;
+	private CustomCrudRepository repos;
 
 	// 리스트 출력
 	/*@GetMapping("/list")
@@ -72,22 +74,44 @@ public class WebBoardController {
 	*/
 	
 	// 리스트 출력_페이징 처리(PageMaker 사용) 및 검색 처리
+	/*
+	 * @GetMapping("/list") public void list(@ModelAttribute("pageVO") PageVO vo,
+	 * Model model) {
+	 * 
+	 * Pageable page = vo.makePageable(0, "bno");
+	 * 
+	 * Page<WebBoard> result = repos.findAll(repos.makePredicate(vo.getType(),
+	 * vo.getKeyword()), page);
+	 * 
+	 * log.info("------------------------------------------------------------------"
+	 * ); log.info("page : " + page); log.info("result : " + result);
+	 * log.info("TOTAL PAGE NUMBER : " + result.getTotalPages());
+	 * log.info("------------------------------------------------------------------"
+	 * );
+	 * 
+	 * model.addAttribute("result", new PageMaker(result));
+	 * 
+	 * }
+	 */
+	 
+	
+	// 댓글 개수 출력 (CustomRepository 사용)
 	@GetMapping("/list")
 	public void list(@ModelAttribute("pageVO") PageVO vo, Model model) {
 		
 		Pageable page = vo.makePageable(0, "bno");
 		
-		Page<WebBoard> result = repos.findAll(repos.makePredicate(vo.getType(), vo.getKeyword()), page);
+		Page<Object[]> result = repos.getCustomPage(vo.getType(), vo.getKeyword(), page);
 		
-		log.info("------------------------------------------------------------------");
-		log.info("page : " + page);
+		log.info("------------------------------------------------------------------"); 
+		log.info("page : " + page); 
 		log.info("result : " + result);
 		log.info("TOTAL PAGE NUMBER : " + result.getTotalPages());
 		log.info("------------------------------------------------------------------");
 		
-		model.addAttribute("result", new PageMaker(result));
-		
+		model.addAttribute("result", new PageMaker<>(result));
 	}
+	
 	
 	// 게시물 등록화면
 	@GetMapping("/register")
