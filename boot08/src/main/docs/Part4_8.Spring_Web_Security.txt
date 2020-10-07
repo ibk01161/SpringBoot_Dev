@@ -62,7 +62,20 @@ Hibernate: create table tbl_member_roles (fno bigint not null auto_increment, ro
 Hibernate: create table tbl_members (uid varchar(255) not null, regdate datetime, uname varchar(255), updatedate datetime, upw varchar(255), primary key (uid)) engine=InnoDB
 Hibernate: alter table tbl_member_roles add constraint FKiy7scif7laghe23vht49x2aka foreign key (member) references tbl_members (uid)
 
+8.2.2. Repository 생성
+- Member가 핵심적인 역할을 하기 때문에 Repository 역시 persistence 패키지 생성하고, MemberRepository 작성
 
+8.2.3. 테스트를 통한 데이터 추가/조회
+- 테스트를 통해 테이블 간의 연관관계 설정을 좀 더 세밀하게 해 주는 것이 좋음, 테스트 폴더에 Test 클래스 생성
+- 작성한 tests 클래스에 테스트에 사용할 데이터를 추가할 수 있도록 코드 추가
+- 엔티티들의 영속관계를 한 번에 처리하지 못해서 에러가 발생해, 이에 대한 처리를 cascade 설정을 추가해야 함 (Member클래스)
+- testInsert() 코드는 101명의 사용자를 생성, 사용자 중 user0 ~ 80 까지는 BASIC이라는 권한, user90까지는 MANAGER, 나머지 10명은 ADMIN 권한을 가지도록 설계
+- 데이터베이스에 정상적으로 데이터가 추가되었으면, 회원 데이터와 함께 권한들에 대한 정보를 같이 조회할 수 있도록 조회 작업 진행
+- tbl_members와 tble_members_roles 테이블을 둘 다 조회해야 하기 때문에 에러가 발생 => 즉시 로딩을 이용해 조인을 하는 방식으로 처리 (권한 정보는 회원 정보와 같이 필요한 경우가 많기 때문에, fetch 모드를 즉시 로딩으로 설정)
+- testRead()를 실행하면 정상적으로 처리 확인
+[log]
+Hibernate: select member0_.uid as uid1_1_0_, member0_.regdate as regdate2_1_0_, member0_.uname as uname3_1_0_, member0_.updatedate as updateda4_1_0_, member0_.upw as upw5_1_0_, roles1_.member as member3_0_1_, roles1_.fno as fno1_0_1_, roles1_.fno as fno1_0_2_, roles1_.role_name as role_nam2_0_2_ from tbl_members member0_ left outer join tbl_member_roles roles1_ on member0_.uid=roles1_.member where member0_.uid=?
+2020-10-07 23:33:08.388  INFO 12392 --- [           main] org.zerock.MemberTests                   : memberMember(uid=user85, upw=pw85, uname=사용자85, regdate=2020-10-07 23:27:00.0, updatedate=2020-10-07 23:27:00.0, roles=[MemberRole(fno=86, roleName=MANAGER)])
 
 
 

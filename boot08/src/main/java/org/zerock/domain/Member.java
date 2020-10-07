@@ -3,7 +3,9 @@ package org.zerock.domain;
 import java.sql.Timestamp;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
@@ -35,7 +37,7 @@ public class Member {
 	@UpdateTimestamp
 	private Timestamp updatedate;
 	
-	@OneToMany
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name="member")
 	private List<MemberRole> roles;
 
