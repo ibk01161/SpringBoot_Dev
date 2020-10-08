@@ -77,7 +77,49 @@ Hibernate: alter table tbl_member_roles add constraint FKiy7scif7laghe23vht49x2a
 Hibernate: select member0_.uid as uid1_1_0_, member0_.regdate as regdate2_1_0_, member0_.uname as uname3_1_0_, member0_.updatedate as updateda4_1_0_, member0_.upw as upw5_1_0_, roles1_.member as member3_0_1_, roles1_.fno as fno1_0_1_, roles1_.fno as fno1_0_2_, roles1_.role_name as role_nam2_0_2_ from tbl_members member0_ left outer join tbl_member_roles roles1_ on member0_.uid=roles1_.member where member0_.uid=?
 2020-10-07 23:33:08.388  INFO 12392 --- [           main] org.zerock.MemberTests                   : memberMember(uid=user85, upw=pw85, uname=사용자85, regdate=2020-10-07 23:27:00.0, updatedate=2020-10-07 23:27:00.0, roles=[MemberRole(fno=86, roleName=MANAGER)])
 
+8.3. 단순 시큐리티 적용
+- 스프링 시큐리티는 꽤 복잡하고 다양한 설정이 존재하기 때문에, 시큐리티를 학습할 때에는 단계별로 하나씩 과정을 진행해 보는 것이 좋음
+- 웹에서의 스프링 시큐리티는 기본적으로 필터 기반으로 동작
+- 스프링 시큐리티의 내부에는 상당히 많은 종류의 필터들이 이미 존재하고 있기 때문에, 개발 시에는 필터들의 설정을 조정하는 방식을 주로 사용
 
+8.3.1. 로그인 / 로그아웃 관련 처리
+- 가장 먼저 개발해 볼 내용은 로그인하지 않은 사용자가 특정 경로에 접근하는 것을 막고, 로그인과 로그아웃을 처리해 보는 것
+
+1) 특정 권한을 가진 사람만이 특정 URI에 접근하기
+- SecurityConfig 클래스에는 configure() 메소드를 이용해 웹 자원에 대한 보안을 확인, 현재까지의 configure()는 HttpSecurity 타입을 파라미터로 사용
+- HttpSecurity는 웹과 관련된 다양한 보안 설정을 걸어줄 수 있음
+- 특정한 경로에 특정한 권한을 가진 사용자만 접근할 수 있도록 설정하고 싶을 때에는 authorizeRequests()와 antMatches()를 이용해 경로를 설정할 수 있음
+- authorizeRequests()는 시큐리티 처리에 HttpServletRequest를 이용한다는 것을 의미
+- antMatches()에서는 특정 경로를 지정, 이후 permitAll()은 모든 사용자가 접근할 수 있다는 것을 의미, hasRole()은 시스템상에서 특정 권한을 가진 사람만이 접근할 수 있다는 것을 의미
+- http.authorizeRequests() 뒤의 antMatches()는 사실 빌더 패턴으로, 예제에서는 가독성을 높이는 형태로 작성했으나 실제로는 연속적으로 '.(마침표)' 를 이용하는 방법을 더 많이 사용
+
+* Role과 Privilege
+- 사전적 의미에서 Role은 '역할' 이나 '자격'을 의미하고, Privilege는 '특권'을 의미
+- 스프링 시큐리티에서는 Role 과 Peivilege 외에도 Authority라는 용어를 같이 사용하기 때문에 혼란스러울 수 있음
+- Role은 일종의 Privilege들의 묶음, 세부적인 권한을 Privilege나 Authority로 보고, 이를 모아서 하나의 패키지나 템플릿으로 만든 것을 Role이라고 생각할 수 있음
+- 이 책에서는 이에 대한 구분 없이 권한이라는 용어를 사용하지만 엄격히는 구분해서 사용하는 것이 정석
+
+=> 변경된 설정이 제대로 적용되는지를 확인하기 위해 프로젝트를 실행하고, '/guest', '/manager' 경로로 접근
+- 결과를 보면 '/manager'로 접근하는 경우 'Access Denied' 라는 메세지가 출력됨, 인가 받은 권한이 없기 때문에 해당 경로에 접근할 수 없도록 처리가 됨
+
+2) 로그인 페이지 보여주기
+- 인가 받은 권한이 없는 관계로 접근이 막혔다면 '/login'이라는 경로를 이용해 로그인 페이지를 띄워, 로그인을 해야 접근할 수 있다는 걸 인식시킬 필요가 있음
+- configure()를 수정 => 마지막에 http.formLogin()이라는 경로를 작성, formLogin()은 form 태그 기반의 로그인을 지원하겠다는 설정, 별도 로그인 페이지를 제작하지 않아도 로그인 정보를 입력하는 페이지를 볼 수 있음
+- 브라우저에서 '/login' 경로를 호출하면 스프링 시큐리티에서 제공하는 기본, 로그인 화면을 볼 수 있게 됨 (스프링 시큐리티가 기본으로 제공)
+
+3) 로그인 정보 설정하기
+- 화면에 로그인 페이지가 뜨기는 하지만, 어떤 값을 입력하여도 에러가 발생하면서 달라지는 내용은 없음
+- 로그인이 되기 위해 SecurityConfig에 AuthenticationManagerBuilder를 주입해 인증에 대한 처리를 해야 함
+- AuthenticationManagerBuilder는 단어 뜻 그대로 인증에 대한 다양한 설정을 생성할 수 있음
+- 예를 들어, 메모리상에 있는 정보만을 이용한다거나, JDBC나 LDAP등 정보를 이용해 인증 처리가 가능 (예제에서는 메모리상 인증 정보를 활용)
+- 설정 완료 후 '/manager'를 호출하면 사용자는 '/login'으로 이동, 로그인 처리가 제대로 되는지 확인하기 위해 아이디, 비밀번호 입력 후 로그인하면 '/manager'의 경로로 이동하고 정상적으로 페이지를 볼 수 있음
+
+4) 로그인 관련 정보 삭제하기
+- 웹과 관련된 로그인 정보는 기본적으로 HttpSession을 이용
+- HttpSession은 세션 쿠키라는 것을 이용하기 때문에 기존 로그인 정보를 삭제해야 하는 상황에서는 브라우저를 완전히 종료하거나, 세션 쿠키를 삭제하는 방법을 이용 (크롬은 백그라운드에서 동작하는 경우가 있으므로 주의)
+- 브라우저에서 기존에 접근한 웹 사이트의 모든 쿠키는 '개발자 도구 -> Application 탭 -> Cookies'를 통해 확인
+- 'Cookie' 메뉴 아래 뜨는 사이트를 클릭하면 'Clear' 라는 창을 볼 수 있음, 'Clear'를 클릭하면 해당 사이트에서 받은 모든 쿠키를 삭제할 수 있음, 삭제된 후 다시 원하는 URL을 지정해서 호출할 수 있음
+- 이와 같은 방식을 이용하면 매번 테스트 시에 브라우저를 종료하는 시간을 단축할 수 있다는 장점이 있음
 
 
 
