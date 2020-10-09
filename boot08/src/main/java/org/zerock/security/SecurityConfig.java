@@ -30,9 +30,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		
 		http.authorizeRequests().antMatchers("/guest/**").permitAll();
 		http.authorizeRequests().antMatchers("/manager/**").hasRole("MANAGER");
+		http.authorizeRequests().antMatchers("/admin/**").hasRole("ADMIN");
 		
 		// 권한이 없으면 로그인 페이지로
-		http.formLogin();
+		http.formLogin().loginPage("/login");
+		
+		// 권한 없음을 알려주고 로그인 화면으로 이동 (admin으로 이동할 때)
+		http.exceptionHandling().accessDeniedPage("/accessDenied");
+		
+		// 세션 무효화
+		http.logout().logoutUrl("/logout").invalidateHttpSession(true);
 	}
 	
 	@Bean
