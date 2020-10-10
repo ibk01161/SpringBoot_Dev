@@ -1,5 +1,7 @@
 package org.zerock.security;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -14,13 +16,32 @@ import lombok.extern.java.Log;
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
-	// 인증에 대한 처리
+	@Autowired
+	DataSource dataSource;
+	
+	// 인증에 대한 처리 (메모리)
+	/*
+	 * @Autowired public void configureGlobal(AuthenticationManagerBuilder auth)
+	 * throws Exception {
+	 * 
+	 * log.info("build Auth global............");
+	 * 
+	 * auth.inMemoryAuthentication().withUser("manager").password("1111").roles(
+	 * "MANAGER");
+	 * 
+	 * }
+	 */
+	
+	// 인증에 대한 처리 (JDBC)
 	@Autowired
 	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 		
-		log.info("build Auth global............");
+		log.info("build Auth global...............");
 		
-		auth.inMemoryAuthentication().withUser("manager").password("1111").roles("MANAGER");
+		String query1 = "SELECT uid username, CONCAT('{noop}', upw) password, true enabled FROM tbl_members WHERE uid = ?";
+		String query2 = "SELECT member uid, role_name role FROM tbl_member_roles WHERE member = ?";
+		
+		auth.jdbcAuthentication().dataSource(dataSource).usersByUsernameQuery(query1).rolePrefix("ROLE_").authoritiesByUsernameQuery(query2);
 		
 	}
 	
