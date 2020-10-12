@@ -228,9 +228,13 @@ Part4.8_ing
 
 # 201010
 Part4.8_ing
-* 다양한 인증 방식 (JDBC이용)_1
+* 다양한 인증 방식 (JDBC이용) 1
 
 # 201011
 Part4.8_ing
-* 다양한 인증 방식 (JDBC이용)_2
-* 다양한 인증 방식 (CustomUsersService 이용)_1
+* 다양한 인증 방식 (JDBC이용) 2
+* 다양한 인증 방식 (CustomUsersService 이용) 1
+
+# 201012
+Part4.8_ing
+* 다양한 인증 방식 (CustomUsersService 이용) 2
