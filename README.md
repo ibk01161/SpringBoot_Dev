@@ -238,3 +238,7 @@ Part4.8_ing
 # 201012
 Part4.8_ing
 * 다양한 인증 방식 (CustomUsersService 이용) 2
+
+# 201013
+Part4.8_ing
+* Thymeleaf에서 스프링 시큐리티 처리하기

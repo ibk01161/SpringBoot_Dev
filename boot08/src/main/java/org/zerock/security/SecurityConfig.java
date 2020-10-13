@@ -23,17 +23,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	ZerockUsersService zerockUsersService;
 	
 	// 인증에 대한 처리 (메모리)
-	/*
-	 * @Autowired public void configureGlobal(AuthenticationManagerBuilder auth)
-	 * throws Exception {
-	 * 
-	 * log.info("build Auth global............");
-	 * 
-	 * auth.inMemoryAuthentication().withUser("manager").password("1111").roles(
-	 * "MANAGER");
-	 * 
-	 * }
-	 */
+	
+	  @Autowired public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+	  
+	  log.info("build Auth global............");
+	  
+	  auth.inMemoryAuthentication().withUser("manager").password("1111").roles("ADMIN");
+	  
+	  }
+	 
 	
 	// 인증에 대한 처리 (JDBC)
 //	@Autowired
@@ -67,7 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.logout().logoutUrl("/logout").invalidateHttpSession(true);
 		
 		// ZerockUsersService 이용
-		http.userDetailsService(zerockUsersService);
+		//http.userDetailsService(zerockUsersService);
 	}
 	
 	@Bean
