@@ -10,6 +10,11 @@ import org.springframework.security.core.userdetails.User;
 import org.zerock.domain.Member;
 import org.zerock.domain.MemberRole;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ZerockSecurityUser extends User {
 	
 	private static final String ROLE_PREFIX = "ROLE_";

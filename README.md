@@ -241,4 +241,9 @@ Part4.8_ing
 
 # 201013
 Part4.8_ing
-* Thymeleaf에서 스프링 시큐리티 처리하기
+* Thymeleaf에서 스프링 시큐리티 처리하기_1
+
+# 201014
+Part4.8_ing
+* Thymeleaf에서 스프링 시큐리티 처리하기_2
+* 자동 로그인 구현_1
