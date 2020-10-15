@@ -23,7 +23,9 @@ public class ZerockSecurityUser extends User {
 	
 	public ZerockSecurityUser(Member member) {
 		
-		super(member.getUid(), "{noop}" + member.getUpw(), makeGrantedAuthority(member.getRoles()));
+		// passwordEncoder() 사용시 {noop} 제외
+		//super(member.getUid(), "{noop}" + member.getUpw(), makeGrantedAuthority(member.getRoles()));
+		super(member.getUid(), member.getUpw(), makeGrantedAuthority(member.getRoles()));
 		this.member = member;
 		
 	}

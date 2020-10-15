@@ -20,6 +20,7 @@ public class ZerockUsersService implements UserDetailsService {
 	@Autowired
 	MemberRepository repos;
 	
+	// ZerockUsersService 테스트
 //	@Override
 //	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 //	

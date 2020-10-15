@@ -247,3 +247,8 @@ Part4.8_ing
 Part4.8_ing
 * Thymeleaf에서 스프링 시큐리티 처리하기_2
 * 자동 로그인 구현_1
+
+# 201015
+Part4.8_ing
+* 다양한 인증 방식 (CustomUsersService 이용) 수정
+* 자동 로그인 구현_2 
