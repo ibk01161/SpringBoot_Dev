@@ -5,15 +5,19 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
 import lombok.extern.java.Log;
 
 @Log
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
@@ -21,6 +25,34 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	
 	@Autowired
 	ZerockUsersService zerockUsersService;
+	
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		
+		return new PasswordEncoder() {
+			
+			@Override
+			public String encode(CharSequence rawPassword) {
+				return rawPassword.toString();
+			}
+			
+			@Override
+			public boolean matches(CharSequence rawPassword, String encodedPassword) {
+				return rawPassword.equals(encodedPassword);
+			}
+			
+		};
+		
+	}
+	
+	// JdbcTokenRepositoryImple 설정 (자동로그인)
+	private PersistentTokenRepository getJDBCRepository() {
+		
+		JdbcTokenRepositoryImpl repos = new JdbcTokenRepositoryImpl();
+		repos.setDataSource(dataSource);
+		return repos;
+		
+	}
 	
 	// 인증에 대한 처리 (메모리)
 //	@Autowired 
@@ -70,26 +102,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		//http.userDetailsService(zerockUsersService);
 		
 		// ZerockUsersService 이용 & remeber-me 설정
-		http.rememberMe().key("zerock").userDetailsService(zerockUsersService);
+		//http.rememberMe().key("zerock").userDetailsService(zerockUsersService);
+		
+		// remeber-me 설정 (JdbcTokenRepository 이용)
+		http.rememberMe().key("zerock").userDetailsService(zerockUsersService).tokenRepository(getJDBCRepository()).tokenValiditySeconds(60*60*24);
 	}
 	
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		
-		return new PasswordEncoder() {
-			
-			@Override
-			public String encode(CharSequence rawPassword) {
-				return rawPassword.toString();
-			}
-			
-			@Override
-			public boolean matches(CharSequence rawPassword, String encodedPassword) {
-				return rawPassword.equals(encodedPassword);
-			}
-			
-		};
-		
-	}
+	
 
 }

@@ -305,7 +305,34 @@ SessionId: BBAECC5953124BC8161CFD60DDC883B3; Granted Authorities: ROLE_MANAGER
 - 브라우저에서 전송하는 정보를 보면 저장된 'remember-me' 쿠키의 유효기간이 지나지 않았으므로, 서버에 접근할 때 같이 전송되는 것을 볼 수 있음
 - 'remember-me' 쿠키는 기본적으로 로그아웃 시점에 같이 삭제되기 때문에 별도의 처리 없이도 자동으로 삭제됨
 
+8.6.3. remember-me를 데이터베이스에 보관하기
+- 스프링 시큐리티는 기본적으로 'remember-me' 기능을 사용하기 위해 'Hash-based Token 저장 방식'과 'Persistent Token 저장 방식'을 사용할 수 있음
+- 이전의 예제는 아무런 설정을 하지 않았으므로 'Hash-based 방식'을 이용하게 됨
+- 'remember-me' 쿠키의 생성은 기본적으로 'username'과 쿠키의 만료시간, 패스워드를 Base-64 방식으로 인코딩한 것
+- 이러한 방식의 문제점은 사용자가 패스워드를 변경하면, 정상적인 값이라도 로그인이 될 수 없다는 단점을 가지고 있음 (이를 해결하기 위해 가능하면 데이터베이스를 이용해서 처리하는 방식을 권장)
+- 데이터베이스를 이용하는 설정은 ~~~.JdbcTokenRepositoryImpl이라는 긴 이름의 클래스를 이용
+- 원한다면 PersistenceTokenRepository라는 인터페이스를 이용해 자신이 원하는 대로 구현이 가능하지만, 관련된 모든 SQL을 직접 개발해야 하므로 예제에서는 구현X
+- 예제에서는 이미 구현된 JdbcTokenRepositoryImpl을 그대로 활용해 정보를 데이터베이스에 보관
+- 우선 토큰을 보관할 수 있는 테이블 생성
+- SecurityConfig에서는 rememberMe()를 처리할 때 JdcTokenRepositoryImpl을 지정해 주어야 하는데 기본적으로 DataSource가 필요하므로 주입해 줄 필요가 있음
+- HttpSecurity에서는 JdbcTokenRepositoryImpl을 이용할 것이므로 간단한 메소드를 이용해서 처리, HttpSecurity가 이를 이용하도록 configure() 메소드의 내부 수정
+- 마지막에 추가한 tokenValiditySeconds()는 쿠키의 유효시간을 초단위로 설정하는데 사용, 코드에서는 24시간을 유지하는 쿠키를 생성
+- SecurityConfig의 설정을 추가한 후에 화면에서 'remember-me'를 선택한 로그인을 하면 'persistent_logins' 테이블에 생성된 토큰의 값이 기록되는 것을 확인, 브라우저에서는 해당 토큰을 이용한 쿠키가 생성됨
+- 이제 쿠키의 생성은 패스워드가 아니라 series에 있는 값을 기준으로 하게 됨, 사용자가 자동로그인을 한 상태에서 브라우저를 종료하고, 다시 URL로 접근하게 되면 서버에서는 다음과 같은 로그가 출력됨
+[log]
+2020-10-16 23:11:58.823 DEBUG 19388 --- [nio-8080-exec-3] r.PersistentTokenBasedRememberMeServices : Remember-me cookie detected
+2020-10-16 23:11:58.830 DEBUG 19388 --- [nio-8080-exec-3] r.PersistentTokenBasedRememberMeServices : Refreshing persistent login token for user 'user93', series 'FF/w25cCa4IXAAwuPYufSg=='
+Hibernate: select member0_.uid as uid1_1_0_, member0_.regdate as regdate2_1_0_, member0_.uname as uname3_1_0_, member0_.updatedate as updateda4_1_0_, member0_.upw as upw5_1_0_, roles1_.member as member3_0_1_, roles1_.fno as fno1_0_1_, roles1_.fno as fno1_0_2_, roles1_.role_name as role_nam2_0_2_ from tbl_members member0_ left outer join tbl_member_roles roles1_ on member0_.uid=roles1_.member where member0_.uid=?
+2020-10-16 23:11:58.975 DEBUG 19388 --- [nio-8080-exec-3] r.PersistentTokenBasedRememberMeServices : Remember-me cookie accepted
 
+8.7. 기타 시큐리티 설정
+- 남은 여러 기능 중 어노테이션을 이용한 처리와 PasswordEncoder 설정 구현
+
+8.7.1. MVC에 어노테이션 처리하기
+- 지금까지 SecurityConfig 클래스에 configure() 메소드를 이용해 특정 경로에 접근을 제어하는 설정을 제어할 수 있지만, 간단한 방식은 특정 경로나 URI에 간단한 어노테이션만을 이용해 접근을 제한하는 방식이 있음
+- 이를 위해 스프링 시큐리티는 @Secured라는 어노테이션을 제공, @Secured에는 문자열의 배열이나 문자열을 이용해 권한을 지정 => SampleContorller에서 몇 개의 URI 테스트, templates에 html파일 생성
+- 작성된 URI로 접근해 보면 @Secured 설정이 추가되어도 제약 없이 접근이 가능한 것을 볼 수 있음
+- @Secured가 제대로 작동하기 위해서는 SecurityConfig에 @EnableGlobalMethodSecurity라는 어노테이션을 추가해 주고, securedEnabled 속성의 값을 true로 지정해야 함 => @Secured 설정에 따라 로그인 페이지로 이동
 
 
 

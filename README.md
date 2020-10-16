@@ -251,4 +251,9 @@ Part4.8_ing
 # 201015
 Part4.8_ing
 * 다양한 인증 방식 (CustomUsersService 이용) 수정
-* 자동 로그인 구현_2 
+* 자동 로그인 구현_2
+
+# 201016
+Part4.8_ing
+* 자동 로그인 구현_3
+* MVC에서 @Secured 어노테이션 처리
