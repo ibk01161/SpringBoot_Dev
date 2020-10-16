@@ -334,7 +334,36 @@ Hibernate: select member0_.uid as uid1_1_0_, member0_.regdate as regdate2_1_0_, 
 - 작성된 URI로 접근해 보면 @Secured 설정이 추가되어도 제약 없이 접근이 가능한 것을 볼 수 있음
 - @Secured가 제대로 작동하기 위해서는 SecurityConfig에 @EnableGlobalMethodSecurity라는 어노테이션을 추가해 주고, securedEnabled 속성의 값을 true로 지정해야 함 => @Secured 설정에 따라 로그인 페이지로 이동
 
+8.7.2. PasswordEncoder 사용하기
+- 사용자가 회원가입할 때 입력하는 패스워드는 가능하면 암호화 처리를 해 주어 다른 사람들이 알아볼 수 없게 하는 것이 좋음
+- 스프링 시큐리티는 이러한 암호화를 처리할 수 있는 도구들을 지원하기 때문에 약간의 설정만으로도 입력된 정보를 암호화하고, 이를 실제 서비스에 적용할 수 있음
+- 스프링 시큐리티는 패스워드를 쉽게 암호화할 수 있는 PasswordEncoder라는 인터페이스를 기준으로 제공하고 있고, 인터페이스를 구현한 다양한 종류의 클래스를 제공하고 있음
+- API상에서 PasswordEncoder를 구현한 클래스들을 이용하는 것만으로도 암호화 처리가 가능, 예제에서는 단방향 해시 알고리즘으로 구현되는 BCryptPasswordEncoder를 이용해 사용자의 정보를 암호화
 
+* PasswordEncoder를 적용하는 방식
+1) 구현 클래스 작성
+2) 시큐리티 설정 추가
+3) 관련 컨트롤러나 서비스와 연동
+=> 1)은 이미 API에서 제공되기 때문에 2단계 부터 진행
+
+- PasswordEncoder는 단순히 설정에서만 사용하는 것이 아니고, 다른 서비스에서도 이용되기 때문에 아예 별도 빈으로 생성될 수 있도록 처리
+- @Bean으로 등록되어서 반환되는 객체 자체는 스프링의 빈으로 등록되도록 설정
+- PasswordEncoder를 이용하기 위해서는 인증 매니저가 PasswordEncoder를 이용할 것이라는 것을 명시해야 함, 이 설정을 위해 SecurityConfig의 설정 수정
+- AuthenticationManager를 이용해야 하기 때문에 기존에 주석으로 처리된 configureGlobal() 메소드를 다시 살리고, UserDetailsService에 대한 주입 역시 메소드 내부에서 처리하도록 수정
+
+8.7.3. 컨트롤러를 이용한 회원가입 처리
+- 설정을 제대로 확인해 보기 위해 직접 회원가입을 통해 암호화된 데이터가 들어가고, 사용자가 정상적으로 로그인할 수 있는지 확인하는 작업이 필요
+- 암호화를 테스트하기 위해 MemberController를 하나 작성하고, 실제로 회원가입을 처리할 수 있는 기본 구조를 생성
+- 컨트롤러를 보면 PasswordEncoder를 주입받고, 데이터베이스 처리를 위한 MemberReository를 추가해 둔 것을 확인할 수 있음
+- templates에는 member 폴더를 작성하고, html 파일 추가해야 함
+- Member의 roles는 List<MemberRole>로 처리되어 있으므로, '[1]'과 같이 인덱스 번호를 활용해 처리하고, POST 방식으로 데이터를 전송할 때에는 CSRF 토큰을 같이 사용해야 함
+- 원하는 데이터를 입력한 상태에서 전송한 후 MemberController에서 출력되는 로그 확인
+[log]
+2020-10-17 02:23:53.435  INFO 19388 --- [nio-8080-exec-6] org.zerock.controller.MemberContorller   : MEMBER : Member(uid=newbie, upw=newbie, uname=홍길동, regdate=null, updatedate=null, roles=[MemberRole(fno=null, roleName=null), MemberRole(fno=null, roleName=MANAGER)])
+* 아직 PasswordEncoder를 사용하지 않았기 때문에 upw는 사용자가 입력한 값 그대로 출력됨 (암호화를 하기 위해 컨트롤러에 PasswordEncoder 이용)
+- 암호화 처리 후 결과를 보여주는 JoinResult.html에서 사용자의 가입 정보가 보이도록 작성
+- 데이터베이스가 올바르게 저장되었다면, 기존 Member 정보들은 암호화가 되지 않은 정보이므로 테스트 코드를 이용해서 업데이트해야 함 => 테스트 코드 실행 후 모든 데이터가 암호화 됨
+- 패스워드가 암호화되었는지 확인하고, 권한이 필요한 URI를 지정해 로그인 페이지로 이동 후 로그인을 시도
 
 
 

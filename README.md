@@ -257,3 +257,8 @@ Part4.8_ing
 Part4.8_ing
 * 자동 로그인 구현_3
 * MVC에서 @Secured 어노테이션 처리
+
+# 201017
+Part4.8_complete
+* PasswordEncoder 적용
+* 기본 구조로 된 회원가입 구현

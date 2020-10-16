@@ -1,0 +1,28 @@
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity4">
+
+<head>
+<title>JOIN</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+
+<form method="post">
+	<p>
+		<label>UID</label>
+		<input type="text" name="uid" th:value="${member.uid}" readonly="readonly" />
+	</p>
+	<p>
+		<label>UPW</label>
+		<input type="text" name="upw" th:value="${member.upw}" readonly="readonly" />
+	</p>
+	<p>
+		<label>UNAME</label>
+		<input type="text" name="uname" th:value="${member.uname}" readonly="readonly" />
+	</p>
+	
+	<p>[[${member.roles}]]</p>
+</form>
+
+</body>
+</html>
