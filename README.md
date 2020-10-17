@@ -262,3 +262,7 @@ Part4.8_ing
 Part4.8_complete
 * PasswordEncoder 적용
 * 기본 구조로 된 회원가입 구현
+
+# 201018
+Part4.9_ing
+* 프로젝트 생성 및 기존 프로젝트 통합
