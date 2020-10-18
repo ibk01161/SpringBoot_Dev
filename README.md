@@ -266,3 +266,7 @@ Part4.8_complete
 # 201018
 Part4.9_ing
 * 프로젝트 생성 및 기존 프로젝트 통합
+
+# 201019
+Part4.9_ing
+* 스프링 시큐리티 설정 및 html 수정 (register, view)
