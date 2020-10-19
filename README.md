@@ -270,3 +270,7 @@ Part4.9_ing
 # 201019
 Part4.9_ing
 * 스프링 시큐리티 설정 및 html 수정 (register, view)
+
+# 201020
+Part4.9_ing
+* 스프링 시큐리티 설정 및 html 수정 (게시물 수정/삭제, 댓글 추가)

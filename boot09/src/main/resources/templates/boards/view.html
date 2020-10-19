@@ -6,6 +6,10 @@
 	  
 <div layout:fragment="content">
 
+	<!-- CSRF 설정 추가 -->
+	<form th:action="${'/login'}"></form>
+	
+
 	<div class="panel-heading">View Page</div>
 	<div class="panel-body">
 		
@@ -86,7 +90,7 @@
 				<label>댓글 내용</label>
 				<input type="text" class="form-control" name="replyText">
 				<label>댓글 작성자</label>
-				<input type="text" class="form-control" name="replyer">
+				<input type="text" class="form-control" name="replyer" readonly="readonly">
 			</div>
 			<div class="modal-footer">
 				<button id="delModalBtn" class="btn btn-danger">삭제</button>
@@ -124,10 +128,28 @@
 		
 		var mode;
 		
+		var uid = [[${#authentication.principal} eq 'anonymousUser' ? null : ${#authentication.principal.member.uid}]];
+		
+		/* CSRF JavaScript 객체 변환 */
+		var csrf = JSON.parse('[[${_csrf}]]');
+		
+		
 		// 댓글 추가 버튼
 		$('#addReplyBtn').on('click', function() {
+			
+			if(uid == null) {
+				if(confirm('로그인할까요?')) {
+					self.location = [[@{/login}]];
+				}
+				return;
+			}
+			
+			replyerObj.val(uid);
+			
 			$('#myModal').modal('show');
 			$('.modal-title').text("댓글 추가");
+			
+			$('#delModalBtn').hide();
 			
 			mode = "ADD";
 		});
@@ -156,7 +178,7 @@
 			
 			if (mode == "ADD") {
 				
-				var obj = {replyText:replyText, replyer:replyer, bno:bno};
+				var obj = {replyText:replyText, replyer:replyer, bno:bno, csrf:csrf};
 				
 				console.log(obj);
 				
@@ -262,8 +284,6 @@
 			}
 			
 			// 수정/삭제 버튼 제어(사용자 아이디 유무)
-			var uid = [[${#authentication.principal} eq 'anonymousUser' ? null : ${#authentication.principal.member.uid}]];
-			
 			$('#goModBtn').click(function(e) {
 				
 				e.preventDefault();
