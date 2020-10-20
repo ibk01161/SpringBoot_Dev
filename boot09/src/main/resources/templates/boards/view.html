@@ -195,7 +195,7 @@
 				
 			} else if (mode = "MOD") {
 				
-				var obj = {replyText:replyText, bno:bno, rno:rno};
+				var obj = {replyText:replyText, bno:bno, rno:rno, csrf:csrf};
 				
 				console.log(obj);
 				
@@ -229,14 +229,23 @@
 			
 			replyTextObj.val(tds[1].innerHTML);
 			replyerObj.val(tds[2].innerHTML);
+			$('#delModalBtn').show();
 			$('#myModal').modal('show');
 			$('.modal-title').text("댓글 수정 및 삭제");
+			
+			// 로그인 관련 버튼 제어
+			if (uid != tds[2].innerHTML.trim()) {
+				
+				$('#delModalBtn').hide();
+				$('#modalBtn').hide();
+				
+			}
 		});
 		
 		// 댓글 삭제
 		$('#delModalBtn').on('click', function() {
 			
-			var obj = {bno:bno, rno:rno};
+			var obj = {bno:bno, rno:rno, csrf:csrf};
 			
 			result = confirm("댓글을 삭제 하시겠습니까?");
 			
