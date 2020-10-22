@@ -137,6 +137,8 @@
 		// 댓글 추가 버튼
 		$('#addReplyBtn').on('click', function() {
 			
+			console.log("uid : " + uid);
+			
 			if(uid == null) {
 				if(confirm('로그인할까요?')) {
 					self.location = [[@{/login}]];
