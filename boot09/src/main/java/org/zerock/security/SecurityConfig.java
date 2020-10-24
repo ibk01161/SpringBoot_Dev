@@ -90,8 +90,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		
 		http.authorizeRequests().antMatchers("/boards/list").permitAll().antMatchers("/boards/register").hasAnyRole("BASIC", "MANAGER", "ADMIN");
 		
-		// 권한이 없으면 로그인 페이지로
-		http.formLogin().loginPage("/login");
+		// 권한이 없으면 로그인 페이지로 (LoginSuccessHandler 이용)
+		http.formLogin().loginPage("/login").successHandler(new LoginSuccessHandler());
 		
 		// 권한 없음을 알려주고 로그인 화면으로 이동 (admin으로 이동할 때)
 		http.exceptionHandling().accessDeniedPage("/accessDenied");

@@ -283,3 +283,7 @@ Part4.9_ing
 Part4.9_ing
 * 기타 설정 - 로그인 후 페이지 이동
 * 기타 설정 - 로그인 후 페이지 이동 (인터셉터 클래스 추가)
+
+# 201024
+Part4.9_ing
+* 기타 설정 - 로그인 후 페이지 이동 (인터셉터 설정, AuthenticationSuccessHandler 클래스 추가, view.html 수정)

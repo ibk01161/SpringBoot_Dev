@@ -114,7 +114,25 @@ token: "5116b495-c83f-43a5-9295-7aba2034c429"
 - interceptor 패키지를 작성하고 LoginCheckInterceptor 클래스를 생성
 - 스프링의 인터셉터에 여러 메소드 중 preHandle()은 컨트롤러의 호출 전 동작, 코드의 내용은 파라미터의 이름에 dest가 존재한다면 이를 HttpSession에 저장하게 됨
 
+9.6.2. 인터셉터 설정
+- 스프링 부트 프로젝트에 MVC 관련 설정을 하기 위해 WebMvcConfigurerAdapter라는 추상 클래스를 이용, 하지만 스프링 부트 1.4 이후에 deprecated(비추천) 되었기 때문에 과거와는 조금 다른 방식으로 구현
+- WebMvcConfigurerAdapter는 인터페이스의 모든 내용은 default 메소드 방식으로 인터페이스 내부에 구현된 형태로 변경됨
+- 추상 클래스를 사옥하는 대신 인터페이스를 직접 implements하고 필요한 메소드를 오버라이드하는 형태로 작성, InterceptorConfig 클래스 추가
+- 인터셉터는 어떠한 URI에 동작하는지에 대한 설정이 필요하므로 addInterceptors()를 오버라이드해서 처리, LoginCheckInterceptor를 '/login' 경로 호출시 동작하도록 설정
 
+9.6.3. AuthenticationSuccessHandler 추가
+- 인터셉터가 '/login' 접근 시 dest라는 파라미터를 저장하도록 설계되었다면 남은 작업은 시큐리티의 로그인 처리 후 이동을 제어하는 작업
+- AuthenticationSuccessHandler 인터페이스를 구현하면 로그인 처리 후 원하는 동작을 제어할 수 있음, 이 인터페이스를 그대로 구현하는 방식도 나쁘지 않지만, 구현된 여러 클래스가 존재하므로, 이를 이용하면 더 빠르게 작성 가능
+- 예제에서는 하위 구현 클래스 중에 SavedRequestAwareAuthenticationSuccessHandler를 이용해 URI를 제어, 이 구현 클래스는 determineTargetUrl을 이용해 redirect의 URL을 결정해 주는 메소드를 오버라이드 할 수 있음
+- security  패키지에 LoginSuccessHandelr 클래스를 작성
+- LoginSuccessHandler의 핵심 역할은 HttpSession에 dest 값이 존재하는 경우, redirect의 경로를 dest 값으로 지정해주는 것, 만약 dest가 존재하지 않는 경우 기존 방식으로 동작
+
+* Securityconfig의 설정 변경
+- '/login' 처리 후 작성한 LoginSuccessHandler를 이용하도록 설정을 변경해 줘야함, loginPage() 설정 뒤에 successHandler()를 추가해 줘야 정상적으로 동작
+
+* view.html 수정
+- view.html에서는 댓글을 추가하기 위해서 로그인으로 이동하는 경우, 로그인 후에 다시 현재 페이지를 보도록 지정해야 함
+- 로그인이 처리되어야 하는 상황이라면 '/login?dest=로그인 후 이동 경로'를 URL로 처리, 이전 동작 방식과 비교해 보면 로그인 이후 다시 게시물 조회 페이지로 이동하는 것을 볼 수 있음
 
 
 
